@@ -12,6 +12,13 @@ public class PluginConfiguration : BasePluginConfiguration
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginConfiguration"/> class.
     /// </summary>
+    /// <remarks>
+    /// IMPORTANTE: NO pre-poblar Sections ni Tabs aquí.
+    /// El XmlSerializer de Jellyfin llama al constructor y LUEGO añade los items
+    /// del XML encima de los ya existentes. Si el constructor pre-puebla la lista,
+    /// cada reinicio del servidor la duplica (7→14→21→...).
+    /// Los defaults se inicializan una sola vez en Plugin.cs, solo cuando la lista está vacía.
+    /// </remarks>
     public PluginConfiguration()
     {
         EnableCustomLayout = true;
@@ -25,8 +32,8 @@ public class PluginConfiguration : BasePluginConfiguration
         HeroSliderCollectionId = string.Empty;
         HeroSliderGenreName = string.Empty;
         HideWatchedGlobally = false;
-        Sections = GetDefaultSections();
-        Tabs = GetDefaultTabs();
+        Sections = [];
+        Tabs = [];
     }
 
     // ── General ─────────────────────────────────────────────
@@ -78,7 +85,8 @@ public class PluginConfiguration : BasePluginConfiguration
 
     // ── Defaults ────────────────────────────────────────────
 
-    private static List<SectionConfigEntry> GetDefaultSections() =>
+    /// <summary>Returns the factory-default section list.</summary>
+    public static List<SectionConfigEntry> GetDefaultSections() =>
     [
         new() { SectionId = "ContinueWatching", DisplayName = "Continuar viendo", Weight = 1, IsBuiltIn = true, CardType = 3 },
         new() { SectionId = "LatestAdded", DisplayName = "Últimas añadidas", Weight = 2, IsBuiltIn = true, CardType = 2 },
@@ -89,7 +97,8 @@ public class PluginConfiguration : BasePluginConfiguration
         new() { SectionId = "TimeSlotSuggestions", DisplayName = "Sugerencias por horario", Weight = 7, IsBuiltIn = true, CardType = 1 },
     ];
 
-    private static List<TabConfigEntry> GetDefaultTabs() =>
+    /// <summary>Returns the factory-default tab list.</summary>
+    public static List<TabConfigEntry> GetDefaultTabs() =>
     [
         new() { TabId = "home", Label = "Inicio", LinkType = 0, Order = 0 },
         new() { TabId = "favorites", Label = "Mis favoritos", LinkType = 4, Order = 1 },

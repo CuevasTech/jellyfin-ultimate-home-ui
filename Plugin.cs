@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Jellyfin.Plugin.UltimateHomeUI.Configuration;
 using MediaBrowser.Common.Configuration;
@@ -33,6 +34,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
         Instance = this;
         _logger = logger;
 
+        EnsureConfigurationDefaults();
         InjectClientScript(applicationPaths, configurationManager);
     }
 
@@ -78,25 +80,94 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     }
 
     /// <summary>
-    /// Injects the client-side module script into Jellyfin's index.html.
-    /// This is the standard approach used by plugins that need to extend the web UI
-    /// (same pattern as jellyfin-plugin-custom-javascript).
+    /// Garantiza que la configuración tenga valores por defecto válidos y sin duplicados.
+    /// Se llama una vez al arrancar Jellyfin.
+    /// El bug: XmlSerializer llama al constructor (que inicializaría la lista) y LUEGO
+    /// deserializa el XML AÑADIENDO items al List existente en lugar de reemplazarlo.
+    /// Por eso el constructor NO pre-puebla las listas — solo aquí se inicializan defaults.
+    /// </summary>
+    private void EnsureConfigurationDefaults()
+    {
+        var config = Configuration;
+        var needsSave = false;
+
+        // Primer arranque: listas vacías → poblar con defaults de fábrica
+        if (config.Sections.Count == 0)
+        {
+            config.Sections = PluginConfiguration.GetDefaultSections();
+            needsSave = true;
+            _logger.LogInformation("[UHUI] Secciones por defecto inicializadas.");
+        }
+
+        if (config.Tabs.Count == 0)
+        {
+            config.Tabs = PluginConfiguration.GetDefaultTabs();
+            needsSave = true;
+            _logger.LogInformation("[UHUI] Pestañas por defecto inicializadas.");
+        }
+
+        // Sanear configuración corrompida por el bug del XmlSerializer (listas duplicadas).
+        // Mantenemos el ÚLTIMO elemento de cada Id, que corresponde al valor guardado en XML
+        // y puede contener personalizaciones del usuario.
+        var uniqueSections = config.Sections
+            .GroupBy(s => s.SectionId)
+            .Where(g => !string.IsNullOrEmpty(g.Key))
+            .Select(g => g.Last())
+            .ToList();
+
+        if (uniqueSections.Count != config.Sections.Count)
+        {
+            _logger.LogWarning(
+                "[UHUI] Secciones duplicadas detectadas ({Total} → {Unique}). Deduplicando y guardando.",
+                config.Sections.Count,
+                uniqueSections.Count);
+            config.Sections = uniqueSections;
+            needsSave = true;
+        }
+
+        var uniqueTabs = config.Tabs
+            .GroupBy(t => t.TabId)
+            .Where(g => !string.IsNullOrEmpty(g.Key))
+            .Select(g => g.Last())
+            .ToList();
+
+        if (uniqueTabs.Count != config.Tabs.Count)
+        {
+            _logger.LogWarning(
+                "[UHUI] Pestañas duplicadas detectadas ({Total} → {Unique}). Deduplicando y guardando.",
+                config.Tabs.Count,
+                uniqueTabs.Count);
+            config.Tabs = uniqueTabs;
+            needsSave = true;
+        }
+
+        if (needsSave)
+        {
+            SaveConfiguration();
+        }
+    }
+
+    /// <summary>
+    /// Inyecta el módulo JS del frontend en el index.html de Jellyfin.
+    /// Usa el atributo plugin="UltimateHomeUI" para identificar y eliminar inyecciones previas
+    /// antes de reinsertar, garantizando idempotencia y correcta actualización del tag.
     /// </summary>
     private void InjectClientScript(IApplicationPaths applicationPaths, IServerConfigurationManager configurationManager)
     {
         if (string.IsNullOrWhiteSpace(applicationPaths.WebPath))
         {
-            _logger.LogWarning("[UHUI] WebPath is not set — client script injection skipped");
+            _logger.LogWarning("[UHUI] WebPath no configurado — inyección del script omitida.");
             return;
         }
 
         var indexFile = Path.Combine(applicationPaths.WebPath, "index.html");
         if (!File.Exists(indexFile))
         {
-            _logger.LogWarning("[UHUI] index.html not found at {IndexFile}", indexFile);
+            _logger.LogWarning("[UHUI] index.html no encontrado en {IndexFile}", indexFile);
             return;
         }
 
+        // Obtener el BasePath configurado para rutas con subdirectorio (ej: /jellyfin)
         var basePath = string.Empty;
         try
         {
@@ -110,7 +181,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[UHUI] Could not read base path from network config");
+            _logger.LogError(ex, "[UHUI] No se pudo leer BaseUrl de la configuración de red.");
         }
 
         var scriptTag = string.Format(
@@ -122,36 +193,41 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
         {
             var indexContents = File.ReadAllText(indexFile);
 
+            // Eliminar cualquier inyección previa para evitar duplicados al actualizar
             indexContents = Regex.Replace(
                 indexContents,
-                @"<script[^>]*plugin=""UltimateHomeUI""[^>]*>[^<]*</script>",
+                @"<script[^>]*plugin=""UltimateHomeUI""[^>]*>\s*</script>",
                 string.Empty,
                 RegexOptions.Singleline);
 
+            // Evitar inyección doble si el tag ya está presente exactamente igual
             if (indexContents.Contains(scriptTag, StringComparison.Ordinal))
             {
-                _logger.LogInformation("[UHUI] Client script already present in {IndexFile}", indexFile);
+                _logger.LogInformation("[UHUI] Script ya presente en {IndexFile}", indexFile);
                 return;
             }
 
             var bodyClose = indexContents.LastIndexOf("</body>", StringComparison.OrdinalIgnoreCase);
             if (bodyClose < 0)
             {
-                _logger.LogWarning("[UHUI] Could not find </body> tag in {IndexFile}", indexFile);
+                _logger.LogWarning("[UHUI] No se encontró </body> en {IndexFile}", indexFile);
                 return;
             }
 
             indexContents = indexContents.Insert(bodyClose, scriptTag + "\n");
             File.WriteAllText(indexFile, indexContents);
-            _logger.LogInformation("[UHUI] Client script injected into {IndexFile}", indexFile);
+            _logger.LogInformation("[UHUI] Script inyectado en {IndexFile}", indexFile);
         }
         catch (UnauthorizedAccessException ex)
         {
-            _logger.LogError(ex, "[UHUI] Permission denied writing to {IndexFile}. If running in Docker, ensure the web directory is writable.", indexFile);
+            _logger.LogError(
+                ex,
+                "[UHUI] Permiso denegado al escribir en {IndexFile}. En Docker, asegúrate de que el directorio web sea escribible.",
+                indexFile);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[UHUI] Failed to inject client script into {IndexFile}", indexFile);
+            _logger.LogError(ex, "[UHUI] Error al inyectar el script en {IndexFile}", indexFile);
         }
     }
 }

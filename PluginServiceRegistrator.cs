@@ -17,8 +17,5 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<ISortingService, SortingService>();
         serviceCollection.AddSingleton<ISectionQueryService, SectionQueryService>();
         serviceCollection.AddSingleton<IHeroService, HeroService>();
-
-        // Inyecta el script del frontend en index.html al arrancar Jellyfin.
-        serviceCollection.AddHostedService<WebInjectorService>();
     }
 }
