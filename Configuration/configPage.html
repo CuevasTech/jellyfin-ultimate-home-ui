@@ -376,6 +376,10 @@
         });
 
         function loadConfig() {
+            if (typeof ApiClient === 'undefined') {
+                showToast('ApiClient no disponible. Recarga la página.', true);
+                return;
+            }
             ApiClient.getPluginConfiguration(PLUGIN_ID).then(function (cfg) {
                 currentConfig = cfg;
 
@@ -560,6 +564,15 @@
 
         /* ── SAVE ── */
         document.getElementById('btnSave').addEventListener('click', function () {
+            if (!currentConfig) {
+                showToast('La configuración aún no ha cargado, espera un momento', true);
+                return;
+            }
+
+            var btn = document.getElementById('btnSave');
+            btn.disabled = true;
+            btn.textContent = 'Guardando...';
+
             var cfg = currentConfig;
 
             cfg.EnableCustomLayout = document.getElementById('cfgEnable').checked;
@@ -580,8 +593,12 @@
 
             ApiClient.updatePluginConfiguration(PLUGIN_ID, cfg).then(function () {
                 showToast('Configuración guardada');
+                btn.disabled = false;
+                btn.textContent = 'Guardar configuración';
             }).catch(function (err) {
-                showToast('Error al guardar: ' + err, true);
+                showToast('Error al guardar: ' + String(err), true);
+                btn.disabled = false;
+                btn.textContent = 'Guardar configuración';
             });
         });
 
