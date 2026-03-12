@@ -1,0 +1,18 @@
+{
+  "guid": "0736fda4-7484-4372-8ce0-9d959232d19c",
+  "name": "Ultimate Home UI",
+  "description": "Reemplaza la pantalla de inicio de Jellyfin con una experiencia premium estilo Netflix.",
+  "overview": "Plugin desarrollado por CuevasTech.",
+  "owner": "CuevasTech",
+  "category": "UI",
+  "versions": [
+    {
+      "version": "1.0.0.0",
+      "changelog": "Primera versión. Hero Slider, secciones inteligentes, soporte TV/Mobile.",
+      "targetAbi": "10.11.0.0",
+      "sourceUrl": "",
+      "checksum": "",
+      "timestamp": "2026-03-12T00:00:00Z"
+    }
+  ]
+}

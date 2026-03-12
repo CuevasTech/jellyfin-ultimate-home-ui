@@ -1,0 +1,20 @@
+[
+  {
+    "guid": "0736fda4-7484-4372-8ce0-9d959232d19c",
+    "name": "Ultimate Home UI",
+    "description": "Reemplaza la pantalla de inicio de Jellyfin con una experiencia premium estilo Netflix, ultra-personalizable y 100% responsive.",
+    "overview": "Desarrollado por CuevasTech.",
+    "owner": "CuevasTech",
+    "category": "UI",
+    "versions": [
+      {
+        "version": "1.0.0.0",
+        "changelog": "Release v1.0.0",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/CuevasTech/jellyfin-ultimate-home-ui/releases/download/v1.0.0/Jellyfin.Plugin.UltimateHomeUI.zip",
+        "checksum": "def1c60f60ed6912ba6fd04942ce4bb1",
+        "timestamp": "2026-03-12T20:27:40Z"
+      }
+    ]
+  }
+]

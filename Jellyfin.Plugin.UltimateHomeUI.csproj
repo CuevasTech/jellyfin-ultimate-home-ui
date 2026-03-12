@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyName>Jellyfin.Plugin.UltimateHomeUI</AssemblyName>
+    <RootNamespace>Jellyfin.Plugin.UltimateHomeUI</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <NoWarn>CA1002;CA2227;CA1056;CA1724;CA5394;CA1848;CA1031;CA1062;CA1305;CA1826;CA1001</NoWarn>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Authors>CuevasTech</Authors>
+    <Company>CuevasTech</Company>
+    <Copyright>Copyright © CuevasTech 2026</Copyright>
+    <PackageProjectUrl>https://github.com/CuevasTech/jellyfin-ultimate-home-ui</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CuevasTech/jellyfin-ultimate-home-ui</RepositoryUrl>
+    <Description>Reemplaza la pantalla de inicio de Jellyfin con una experiencia premium estilo Netflix.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jellyfin.Model" Version="10.11.6">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Jellyfin.Controller" Version="10.11.6">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Web\**\*" />
+    <EmbeddedResource Include="Configuration\configPage.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="meta.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

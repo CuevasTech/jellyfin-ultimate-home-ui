@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Release
+        run: dotnet publish -c Release -o ./publish/
+
+      - name: Create plugin ZIP
+        run: |
+          cd publish
+          zip -j ../Jellyfin.Plugin.UltimateHomeUI.zip \
+            Jellyfin.Plugin.UltimateHomeUI.dll \
+            meta.json
+          cd ..
+
+      - name: Calculate MD5 checksum
+        id: checksum
+        run: echo "md5=$(md5sum Jellyfin.Plugin.UltimateHomeUI.zip | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Update manifest.json
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          CHECKSUM="${{ steps.checksum.outputs.md5 }}"
+          TAG="${GITHUB_REF_NAME}"
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          SOURCE_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/Jellyfin.Plugin.UltimateHomeUI.zip"
+
+          python3 - <<PYEOF
+          import json, sys
+
+          with open("manifest.json", "r") as f:
+              manifest = json.load(f)
+
+          new_version = {
+              "version": "${VERSION}.0",
+              "changelog": "Release ${TAG}",
+              "targetAbi": "10.11.0.0",
+              "sourceUrl": "${SOURCE_URL}",
+              "checksum": "${CHECKSUM}",
+              "timestamp": "${TIMESTAMP}"
+          }
+
+          manifest[0]["versions"].insert(0, new_version)
+
+          with open("manifest.json", "w") as f:
+              json.dump(manifest, f, indent=2)
+          PYEOF
+
+      - name: Commit updated manifest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "chore: update manifest.json for ${GITHUB_REF_NAME}" || true
+          git push origin HEAD:master
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Jellyfin.Plugin.UltimateHomeUI.zip
+          generate_release_notes: true

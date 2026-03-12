@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Ultimate Home UI</title>
+    <style>
+        .uhui-config { max-width: 900px; margin: 0 auto; padding: 1rem; }
+        .uhui-config h2 { margin-top: 0; }
+        .uhui-config h3 { margin-top: 2rem; border-bottom: 1px solid #444; padding-bottom: 0.5rem; }
+        .uhui-field { margin-bottom: 1rem; }
+        .uhui-field label { display: block; margin-bottom: 0.3rem; font-weight: 600; }
+        .uhui-field select, .uhui-field input[type="number"] {
+            padding: 0.4rem 0.6rem; border: 1px solid #555; border-radius: 4px;
+            background: #1e1e1e; color: #eee; min-width: 200px;
+        }
+        .uhui-field input[type="checkbox"] { margin-right: 0.5rem; }
+        .uhui-sections-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        .uhui-sections-table th, .uhui-sections-table td {
+            padding: 0.5rem; text-align: left; border-bottom: 1px solid #333;
+        }
+        .uhui-sections-table th { font-size: 0.85rem; color: #aaa; }
+        .uhui-sections-table input[type="number"] { width: 60px; }
+        .uhui-btn { padding: 0.5rem 1.2rem; border: none; border-radius: 4px; cursor: pointer;
+            font-weight: 600; margin-right: 0.5rem; margin-top: 1rem; }
+        .uhui-btn--primary { background: #e50914; color: #fff; }
+        .uhui-btn--primary:hover { background: #ff1722; }
+        .uhui-btn--secondary { background: #333; color: #eee; }
+        .uhui-btn--secondary:hover { background: #444; }
+        .uhui-toast {
+            position: fixed; bottom: 2rem; right: 2rem; background: #333; color: #fff;
+            padding: 0.75rem 1.5rem; border-radius: 6px; opacity: 0;
+            transition: opacity 0.3s; pointer-events: none; z-index: 1000;
+        }
+        .uhui-toast--visible { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="ultimateHomeUIConfigPage" data-role="page" class="page type-interior pluginConfigurationPage"
+         data-require="emby-input,emby-button,emby-checkbox,emby-select">
+        <div data-role="content">
+            <div class="content-primary uhui-config">
+                <h2>Ultimate Home UI — Configuración</h2>
+
+                <h3>General</h3>
+
+                <div class="uhui-field">
+                    <label>
+                        <input type="checkbox" id="uhuiEnableCustomLayout" />
+                        Activar layout personalizado
+                    </label>
+                </div>
+
+                <div class="uhui-field">
+                    <label>
+                        <input type="checkbox" id="uhuiHideWatchedGlobally" />
+                        Ocultar contenido ya visto (global)
+                    </label>
+                </div>
+
+                <div class="uhui-field">
+                    <label for="uhuiMaxSections">Máximo de secciones visibles</label>
+                    <input type="number" id="uhuiMaxSections" min="1" max="30" />
+                </div>
+
+                <h3>Hero Slider</h3>
+
+                <div class="uhui-field">
+                    <label>
+                        <input type="checkbox" id="uhuiHeroEnabled" />
+                        Activar Hero Slider
+                    </label>
+                </div>
+
+                <div class="uhui-field">
+                    <label for="uhuiHeroSource">Fuente del Hero</label>
+                    <select id="uhuiHeroSource">
+                        <option value="0">Últimas añadidas</option>
+                        <option value="1">Aleatorio</option>
+                        <option value="2">Colección</option>
+                        <option value="3">Género</option>
+                        <option value="4">Tendencia</option>
+                    </select>
+                </div>
+
+                <div class="uhui-field">
+                    <label for="uhuiHeroMaxItems">Elementos en el Hero</label>
+                    <input type="number" id="uhuiHeroMaxItems" min="1" max="20" />
+                </div>
+
+                <h3>Estrategia de empates</h3>
+
+                <div class="uhui-field">
+                    <label for="uhuiTieBreaking">Cuando varias secciones comparten el mismo peso</label>
+                    <select id="uhuiTieBreaking">
+                        <option value="0">Aleatorio</option>
+                        <option value="1">Alfabético</option>
+                        <option value="2">Última actividad</option>
+                        <option value="3">Orden del servidor</option>
+                    </select>
+                </div>
+
+                <h3>Secciones preestablecidas</h3>
+                <p style="color: #aaa; font-size: 0.85rem;">
+                    Asigna un peso numérico a cada sección. Las secciones con el mismo peso se barajarán
+                    aleatoriamente en cada recarga. Menor peso = aparece primero.
+                </p>
+
+                <table class="uhui-sections-table">
+                    <thead>
+                        <tr>
+                            <th>Sección</th>
+                            <th>Peso</th>
+                            <th>Visible</th>
+                        </tr>
+                    </thead>
+                    <tbody id="uhuiSectionsBody"></tbody>
+                </table>
+
+                <div>
+                    <button class="uhui-btn uhui-btn--primary" id="uhuiSave">Guardar</button>
+                    <button class="uhui-btn uhui-btn--secondary" id="uhuiReset">Restablecer</button>
+                </div>
+
+                <div class="uhui-toast" id="uhuiToast"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        const DEFAULT_SECTIONS = [
+            { sectionId: 'ContinueWatching', displayName: 'Continuar viendo', weight: 1, isVisible: true },
+            { sectionId: 'LatestAdded', displayName: 'Últimas añadidas', weight: 2, isVisible: true },
+            { sectionId: 'Favorites', displayName: 'Mis favoritos', weight: 3, isVisible: true },
+            { sectionId: 'BecauseYouWatched', displayName: 'Porque viste...', weight: 4, isVisible: true },
+            { sectionId: 'WatchAgain', displayName: 'Ver otra vez', weight: 5, isVisible: true },
+            { sectionId: 'HiddenGems', displayName: 'Joyas ocultas', weight: 6, isVisible: true },
+            { sectionId: 'TimeSlotSuggestions', displayName: 'Sugerencias por horario', weight: 7, isVisible: true },
+        ];
+
+        document.querySelector('#ultimateHomeUIConfigPage')
+            .addEventListener('pageshow', function () {
+                loadConfig();
+            });
+
+        function loadConfig() {
+            ApiClient.getPluginConfiguration(getPluginId()).then(function (config) {
+                document.getElementById('uhuiEnableCustomLayout').checked = config.EnableCustomLayout;
+                document.getElementById('uhuiHideWatchedGlobally').checked = config.HideWatchedGlobally;
+                document.getElementById('uhuiMaxSections').value = config.MaxSectionsVisible || 15;
+                document.getElementById('uhuiHeroEnabled').checked = config.HeroSliderEnabled;
+                document.getElementById('uhuiHeroSource').value = config.HeroSliderSource || 0;
+                document.getElementById('uhuiHeroMaxItems').value = config.HeroSliderMaxItems || 5;
+                document.getElementById('uhuiTieBreaking').value = config.DefaultTieBreakingStrategy || 0;
+
+                renderSectionsTable(DEFAULT_SECTIONS);
+            });
+        }
+
+        function renderSectionsTable(sections) {
+            var tbody = document.getElementById('uhuiSectionsBody');
+            tbody.innerHTML = '';
+
+            sections.forEach(function (s) {
+                var tr = document.createElement('tr');
+
+                var tdName = document.createElement('td');
+                tdName.textContent = s.displayName || s.sectionId;
+                tr.appendChild(tdName);
+
+                var tdWeight = document.createElement('td');
+                var input = document.createElement('input');
+                input.type = 'number';
+                input.min = 0;
+                input.max = 100;
+                input.value = s.weight;
+                input.dataset.sectionId = s.sectionId;
+                input.className = 'uhui-section-weight';
+                tdWeight.appendChild(input);
+                tr.appendChild(tdWeight);
+
+                var tdVisible = document.createElement('td');
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = s.isVisible !== false;
+                checkbox.dataset.sectionId = s.sectionId;
+                checkbox.className = 'uhui-section-visible';
+                tdVisible.appendChild(checkbox);
+                tr.appendChild(tdVisible);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('uhuiSave').addEventListener('click', function () {
+            ApiClient.getPluginConfiguration(getPluginId()).then(function (config) {
+                config.EnableCustomLayout = document.getElementById('uhuiEnableCustomLayout').checked;
+                config.HideWatchedGlobally = document.getElementById('uhuiHideWatchedGlobally').checked;
+                config.MaxSectionsVisible = parseInt(document.getElementById('uhuiMaxSections').value, 10) || 15;
+                config.HeroSliderEnabled = document.getElementById('uhuiHeroEnabled').checked;
+                config.HeroSliderSource = parseInt(document.getElementById('uhuiHeroSource').value, 10);
+                config.HeroSliderMaxItems = parseInt(document.getElementById('uhuiHeroMaxItems').value, 10) || 5;
+                config.DefaultTieBreakingStrategy = parseInt(document.getElementById('uhuiTieBreaking').value, 10);
+
+                ApiClient.updatePluginConfiguration(getPluginId(), config).then(function () {
+                    showToast('Configuración guardada correctamente');
+                });
+            });
+        });
+
+        document.getElementById('uhuiReset').addEventListener('click', function () {
+            if (confirm('¿Restablecer toda la configuración a los valores por defecto?')) {
+                ApiClient.getPluginConfiguration(getPluginId()).then(function (config) {
+                    config.EnableCustomLayout = true;
+                    config.HideWatchedGlobally = false;
+                    config.MaxSectionsVisible = 15;
+                    config.HeroSliderEnabled = true;
+                    config.HeroSliderSource = 0;
+                    config.HeroSliderMaxItems = 5;
+                    config.DefaultTieBreakingStrategy = 0;
+
+                    ApiClient.updatePluginConfiguration(getPluginId(), config).then(function () {
+                        loadConfig();
+                        showToast('Configuración restablecida');
+                    });
+                });
+            }
+        });
+
+        function getPluginId() {
+            return '0736fda4-7484-4372-8ce0-9d959232d19c';
+        }
+
+        function showToast(msg) {
+            var toast = document.getElementById('uhuiToast');
+            toast.textContent = msg;
+            toast.classList.add('uhui-toast--visible');
+            setTimeout(function () {
+                toast.classList.remove('uhui-toast--visible');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
