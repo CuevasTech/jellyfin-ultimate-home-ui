@@ -7,8 +7,8 @@
   "category": "UI",
   "versions": [
     {
-      "version": "1.2.0.0",
-      "changelog": "Fix: página de configuración reescrita como fragmento HTML compatible con Jellyfin SPA, CSS y JS funcionales, save con ApiClient.ajax.",
+      "version": "1.3.0.0",
+      "changelog": "Fix dropdowns, colores rosa/azul, campos sin solapar, controller para servir JS del frontend, activación del home injector.",
       "targetAbi": "10.11.0.0",
       "sourceUrl": "",
       "checksum": "",

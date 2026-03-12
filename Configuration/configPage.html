@@ -6,93 +6,114 @@
         #ultimateHomeUIConfigPage .uhui { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; color: #eee; }
         #ultimateHomeUIConfigPage .uhui-header h2 { margin: 0 0 .15rem; font-size: 1.5rem; font-weight: 700; }
         #ultimateHomeUIConfigPage .uhui-header small { color: #999; font-size: .85rem; }
+
         #ultimateHomeUIConfigPage .uhui-tabs { display: flex; gap: 0; border-bottom: 2px solid #333; margin: 1.5rem 0; overflow-x: auto; }
         #ultimateHomeUIConfigPage .uhui-tab {
             padding: .65rem 1.2rem; cursor: pointer; font-weight: 600; font-size: .9rem; color: #999;
             border: none; border-bottom: 3px solid transparent; background: none; white-space: nowrap; transition: .2s;
         }
         #ultimateHomeUIConfigPage .uhui-tab:hover { color: #eee; }
-        #ultimateHomeUIConfigPage .uhui-tab--active { color: #e50914; border-bottom-color: #e50914; }
+        #ultimateHomeUIConfigPage .uhui-tab--active { color: #ff2d78; border-bottom-color: #ff2d78; }
         #ultimateHomeUIConfigPage .uhui-panel { display: none; }
         #ultimateHomeUIConfigPage .uhui-panel--active { display: block; }
+
         #ultimateHomeUIConfigPage .uhui-group { margin-bottom: 1.5rem; }
         #ultimateHomeUIConfigPage .uhui-group-title {
             font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
-            color: #e50914; margin-bottom: .75rem; padding-bottom: .4rem; border-bottom: 1px solid #333;
+            color: #00d4ff; margin-bottom: .75rem; padding-bottom: .4rem; border-bottom: 1px solid #333;
         }
         #ultimateHomeUIConfigPage .uhui-field { margin-bottom: 1rem; }
         #ultimateHomeUIConfigPage .uhui-field label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: .25rem; }
         #ultimateHomeUIConfigPage .uhui-hint { font-size: .78rem; color: #999; margin-top: .15rem; }
         #ultimateHomeUIConfigPage .uhui-row { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; }
-        #ultimateHomeUIConfigPage .uhui-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        @media (max-width: 600px) { #ultimateHomeUIConfigPage .uhui-grid { grid-template-columns: 1fr; } }
+        #ultimateHomeUIConfigPage .uhui-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        @media (max-width: 700px) { #ultimateHomeUIConfigPage .uhui-grid { grid-template-columns: 1fr; } }
+
         #ultimateHomeUIConfigPage input[type="number"],
         #ultimateHomeUIConfigPage input[type="text"],
         #ultimateHomeUIConfigPage select {
             padding: .5rem .7rem; border: 1px solid #444; border-radius: 6px;
-            background: #1a1a1a; color: #eee; font-size: .9rem; max-width: 320px; width: 100%;
+            background: #1a1a1a; color: #eee; font-size: .9rem; max-width: 320px; width: 100%; box-sizing: border-box;
         }
         #ultimateHomeUIConfigPage input[type="number"] { max-width: 120px; }
-        #ultimateHomeUIConfigPage input:focus,
-        #ultimateHomeUIConfigPage select:focus { outline: none; border-color: #e50914; }
-        #ultimateHomeUIConfigPage .uhui-switch { position: relative; display: inline-block; width: 44px; height: 24px; vertical-align: middle; }
-        #ultimateHomeUIConfigPage .uhui-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
-        #ultimateHomeUIConfigPage .uhui-switch-track {
+        #ultimateHomeUIConfigPage input:focus, #ultimateHomeUIConfigPage select:focus { outline: none; border-color: #00d4ff; }
+
+        #ultimateHomeUIConfigPage .uhui-sw { position: relative; display: inline-block; width: 44px; height: 24px; vertical-align: middle; flex-shrink: 0; }
+        #ultimateHomeUIConfigPage .uhui-sw input { opacity: 0; width: 0; height: 0; position: absolute; }
+        #ultimateHomeUIConfigPage .uhui-sw-t {
             position: absolute; inset: 0; background: #555; border-radius: 24px; cursor: pointer; transition: .25s;
         }
-        #ultimateHomeUIConfigPage .uhui-switch-track::before {
+        #ultimateHomeUIConfigPage .uhui-sw-t::before {
             content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px;
             background: #fff; border-radius: 50%; transition: .25s;
         }
-        #ultimateHomeUIConfigPage .uhui-switch input:checked + .uhui-switch-track { background: #e50914; }
-        #ultimateHomeUIConfigPage .uhui-switch input:checked + .uhui-switch-track::before { transform: translateX(20px); }
+        #ultimateHomeUIConfigPage .uhui-sw input:checked + .uhui-sw-t { background: #00d4ff; }
+        #ultimateHomeUIConfigPage .uhui-sw input:checked + .uhui-sw-t::before { transform: translateX(20px); }
+
+        /* ── Section cards ── */
         #ultimateHomeUIConfigPage .uhui-card {
-            background: #222; border: 1px solid #333; border-radius: 8px; padding: 1rem; margin-bottom: .75rem;
+            background: #222; border: 1px solid #333; border-radius: 8px; padding: 1rem 1.1rem; margin-bottom: .85rem;
         }
-        #ultimateHomeUIConfigPage .uhui-card--custom { border-left: 3px solid #e50914; }
-        #ultimateHomeUIConfigPage .uhui-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .75rem; }
+        #ultimateHomeUIConfigPage .uhui-card--custom { border-left: 3px solid #ff2d78; }
+        #ultimateHomeUIConfigPage .uhui-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .85rem; flex-wrap: wrap; gap: .5rem; }
         #ultimateHomeUIConfigPage .uhui-card-head h4 { margin: 0; font-size: .95rem; display: flex; align-items: center; gap: .5rem; }
-        #ultimateHomeUIConfigPage .uhui-badge { font-size: .7rem; padding: .1rem .45rem; border-radius: 10px; font-weight: 600; }
-        #ultimateHomeUIConfigPage .uhui-badge--b { background: #2d3748; color: #a0aec0; }
-        #ultimateHomeUIConfigPage .uhui-badge--c { background: #742a2a; color: #feb2b2; }
-        #ultimateHomeUIConfigPage .uhui-card-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: .6rem; }
-        #ultimateHomeUIConfigPage .uhui-card-fields label { font-size: .8rem; color: #999; display: block; margin-bottom: .2rem; }
+        #ultimateHomeUIConfigPage .uhui-badge { font-size: .65rem; padding: .15rem .5rem; border-radius: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+        #ultimateHomeUIConfigPage .uhui-badge--b { background: #1a3a5c; color: #7dd3fc; }
+        #ultimateHomeUIConfigPage .uhui-badge--c { background: #5c1a3a; color: #fda4c8; }
+        #ultimateHomeUIConfigPage .uhui-card-fields {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: .75rem .85rem;
+        }
+        #ultimateHomeUIConfigPage .uhui-card-fields label { font-size: .78rem; color: #aaa; display: block; margin-bottom: .2rem; }
         #ultimateHomeUIConfigPage .uhui-card-fields input,
-        #ultimateHomeUIConfigPage .uhui-card-fields select { width: 100%; padding: .35rem .5rem; font-size: .85rem; max-width: none; }
-        #ultimateHomeUIConfigPage .uhui-query { margin-top: .75rem; padding-top: .75rem; border-top: 1px dashed #444; }
-        #ultimateHomeUIConfigPage .uhui-query summary { cursor: pointer; font-size: .8rem; font-weight: 600; color: #e50914; }
-        #ultimateHomeUIConfigPage .uhui-query-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .5rem; }
+        #ultimateHomeUIConfigPage .uhui-card-fields select { width: 100%; max-width: none; padding: .4rem .55rem; font-size: .85rem; box-sizing: border-box; }
+
+        #ultimateHomeUIConfigPage .uhui-query { margin-top: .85rem; padding-top: .85rem; border-top: 1px dashed #444; }
+        #ultimateHomeUIConfigPage .uhui-query summary { cursor: pointer; font-size: .8rem; font-weight: 600; color: #ff2d78; }
+        #ultimateHomeUIConfigPage .uhui-query-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin-top: .65rem; }
+        #ultimateHomeUIConfigPage .uhui-query-grid label { font-size: .78rem; color: #aaa; display: block; margin-bottom: .2rem; }
+        #ultimateHomeUIConfigPage .uhui-query-grid input,
+        #ultimateHomeUIConfigPage .uhui-query-grid select { width: 100%; max-width: none; box-sizing: border-box; }
         @media (max-width: 600px) { #ultimateHomeUIConfigPage .uhui-query-grid { grid-template-columns: 1fr; } }
+
+        /* ── Tab rows ── */
+        #ultimateHomeUIConfigPage .uhui-tab-hdr {
+            display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 65px 55px 40px;
+            gap: .65rem; padding: 0 .85rem .5rem; font-size: .72rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: .04em;
+        }
         #ultimateHomeUIConfigPage .uhui-tab-row {
-            display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 60px 50px 40px;
-            gap: .5rem; align-items: center; padding: .6rem .75rem;
-            background: #222; border: 1px solid #333; border-radius: 8px; margin-bottom: .5rem;
+            display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 65px 55px 40px;
+            gap: .65rem; align-items: center; padding: .7rem .85rem;
+            background: #222; border: 1px solid #333; border-radius: 8px; margin-bottom: .6rem;
         }
         #ultimateHomeUIConfigPage .uhui-tab-row input,
-        #ultimateHomeUIConfigPage .uhui-tab-row select { max-width: none; }
-        #ultimateHomeUIConfigPage .uhui-tab-hdr {
-            display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 60px 50px 40px;
-            gap: .5rem; padding: 0 .75rem .4rem; font-size: .75rem; font-weight: 700; color: #999; text-transform: uppercase;
+        #ultimateHomeUIConfigPage .uhui-tab-row select { max-width: none; width: 100%; box-sizing: border-box; }
+        @media (max-width: 700px) {
+            #ultimateHomeUIConfigPage .uhui-tab-hdr,
+            #ultimateHomeUIConfigPage .uhui-tab-row { grid-template-columns: 1fr 1fr; }
         }
+
+        /* ── Buttons ── */
         #ultimateHomeUIConfigPage .uhui-btn {
-            padding: .55rem 1.3rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .9rem;
+            padding: .55rem 1.3rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .9rem; transition: .15s;
         }
-        #ultimateHomeUIConfigPage .uhui-btn--p { background: #e50914; color: #fff; }
-        #ultimateHomeUIConfigPage .uhui-btn--p:hover { background: #ff1a26; }
+        #ultimateHomeUIConfigPage .uhui-btn--p { background: #ff2d78; color: #fff; }
+        #ultimateHomeUIConfigPage .uhui-btn--p:hover { background: #ff4a90; }
+        #ultimateHomeUIConfigPage .uhui-btn--p:disabled { opacity: .6; cursor: wait; }
         #ultimateHomeUIConfigPage .uhui-btn--s { background: #333; color: #eee; }
         #ultimateHomeUIConfigPage .uhui-btn--s:hover { background: #444; }
         #ultimateHomeUIConfigPage .uhui-btn--sm { padding: .3rem .7rem; font-size: .8rem; }
-        #ultimateHomeUIConfigPage .uhui-del { background: none; border: none; color: #999; cursor: pointer; font-size: 1.2rem; padding: .2rem; line-height: 1; }
-        #ultimateHomeUIConfigPage .uhui-del:hover { color: #e50914; }
+        #ultimateHomeUIConfigPage .uhui-del { background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem; padding: .2rem; line-height: 1; }
+        #ultimateHomeUIConfigPage .uhui-del:hover { color: #ff2d78; }
         #ultimateHomeUIConfigPage .uhui-actions { display: flex; gap: .75rem; margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid #333; }
+
         #ultimateHomeUIConfigPage .uhui-toast {
             position: fixed; bottom: 2rem; right: 2rem; padding: .8rem 1.5rem; border-radius: 8px;
             font-weight: 600; font-size: .9rem; z-index: 9999; opacity: 0; pointer-events: none;
             transition: opacity .3s, transform .3s; transform: translateY(10px);
         }
         #ultimateHomeUIConfigPage .uhui-toast--show { opacity: 1; transform: translateY(0); }
-        #ultimateHomeUIConfigPage .uhui-toast--ok { background: #2ecc71; color: #fff; }
-        #ultimateHomeUIConfigPage .uhui-toast--err { background: #e50914; color: #fff; }
+        #ultimateHomeUIConfigPage .uhui-toast--ok { background: #00d4ff; color: #000; }
+        #ultimateHomeUIConfigPage .uhui-toast--err { background: #ff2d78; color: #fff; }
     </style>
 
     <div data-role="content">
@@ -114,36 +135,27 @@
             <div id="panel-general" class="uhui-panel uhui-panel--active">
                 <div class="uhui-group">
                     <div class="uhui-group-title">Ajustes generales</div>
-
                     <div class="uhui-row">
-                        <label class="uhui-switch"><input type="checkbox" id="cfgEnable"><span class="uhui-switch-track"></span></label>
-                        <div>
-                            <label>Activar layout personalizado</label>
-                            <div class="uhui-hint">Reemplaza la pantalla de inicio de Jellyfin</div>
-                        </div>
+                        <label class="uhui-sw"><input type="checkbox" id="cfgEnable"><span class="uhui-sw-t"></span></label>
+                        <div><label>Activar layout personalizado</label><div class="uhui-hint">Reemplaza la pantalla de inicio de Jellyfin</div></div>
                     </div>
                     <div class="uhui-row">
-                        <label class="uhui-switch"><input type="checkbox" id="cfgHideWatched"><span class="uhui-switch-track"></span></label>
-                        <div>
-                            <label>Ocultar contenido ya visto</label>
-                            <div class="uhui-hint">Esconde globalmente los elementos reproducidos. Cada secci&oacute;n puede sobreescribir esto.</div>
-                        </div>
+                        <label class="uhui-sw"><input type="checkbox" id="cfgHideWatched"><span class="uhui-sw-t"></span></label>
+                        <div><label>Ocultar contenido ya visto</label><div class="uhui-hint">Esconde globalmente los elementos reproducidos</div></div>
                     </div>
                     <div class="uhui-grid">
                         <div class="uhui-field">
                             <label>M&aacute;ximo de secciones visibles</label>
-                            <input type="number" id="cfgMaxSections" min="1" max="30">
-                            <div class="uhui-hint">L&iacute;mite de secciones en la home</div>
+                            <input type="number" id="cfgMaxSec" min="1" max="30">
                         </div>
                         <div class="uhui-field">
                             <label>Estrategia de empates</label>
-                            <select id="cfgTieBreaking">
-                                <option value="0">Aleatorio en cada recarga</option>
-                                <option value="1">Alfab&eacute;tico</option>
-                                <option value="2">&Uacute;ltima actividad</option>
-                                <option value="3">Orden del servidor</option>
+                            <select id="cfgTie">
+                                <option value="Random">Aleatorio en cada recarga</option>
+                                <option value="Alphabetical">Alfab&eacute;tico</option>
+                                <option value="LastActivity">&Uacute;ltima actividad</option>
+                                <option value="ServerDefault">Orden del servidor</option>
                             </select>
-                            <div class="uhui-hint">Cuando varias secciones comparten el mismo peso</div>
                         </div>
                     </div>
                 </div>
@@ -154,21 +166,18 @@
                 <div class="uhui-group">
                     <div class="uhui-group-title">Hero Media Slider</div>
                     <div class="uhui-row">
-                        <label class="uhui-switch"><input type="checkbox" id="cfgHeroOn"><span class="uhui-switch-track"></span></label>
-                        <div>
-                            <label>Activar Hero Slider</label>
-                            <div class="uhui-hint">Banner principal con contenido destacado</div>
-                        </div>
+                        <label class="uhui-sw"><input type="checkbox" id="cfgHeroOn"><span class="uhui-sw-t"></span></label>
+                        <div><label>Activar Hero Slider</label><div class="uhui-hint">Banner principal con contenido destacado</div></div>
                     </div>
                     <div class="uhui-grid">
                         <div class="uhui-field">
                             <label>Fuente del contenido</label>
                             <select id="cfgHeroSrc">
-                                <option value="0">&Uacute;ltimas a&ntilde;adidas</option>
-                                <option value="1">Aleatorio</option>
-                                <option value="2">Colecci&oacute;n espec&iacute;fica</option>
-                                <option value="3">G&eacute;nero</option>
-                                <option value="4">Tendencia</option>
+                                <option value="LatestAdded">&Uacute;ltimas a&ntilde;adidas</option>
+                                <option value="Random">Aleatorio</option>
+                                <option value="Collection">Colecci&oacute;n espec&iacute;fica</option>
+                                <option value="Genre">G&eacute;nero</option>
+                                <option value="Trending">Tendencia</option>
                             </select>
                         </div>
                         <div class="uhui-field">
@@ -176,22 +185,19 @@
                             <input type="number" id="cfgHeroMax" min="1" max="20">
                         </div>
                     </div>
-                    <div class="uhui-field" id="fldHeroCollection" style="display:none">
+                    <div class="uhui-field" id="fldHeroCol" style="display:none">
                         <label>ID de la colecci&oacute;n</label>
                         <input type="text" id="cfgHeroColId" placeholder="a1b2c3d4-...">
                         <div class="uhui-hint">GUID de la colecci&oacute;n (BoxSet)</div>
                     </div>
-                    <div class="uhui-field" id="fldHeroGenre" style="display:none">
+                    <div class="uhui-field" id="fldHeroGen" style="display:none">
                         <label>Nombre del g&eacute;nero</label>
                         <input type="text" id="cfgHeroGenre" placeholder="Acci&oacute;n">
                     </div>
                     <div class="uhui-grid">
                         <div class="uhui-row">
-                            <label class="uhui-switch"><input type="checkbox" id="cfgHeroAuto"><span class="uhui-switch-track"></span></label>
-                            <div>
-                                <label>Autoplay de tr&aacute;iler</label>
-                                <div class="uhui-hint">Reproduce el tr&aacute;iler de fondo en mute</div>
-                            </div>
+                            <label class="uhui-sw"><input type="checkbox" id="cfgHeroAuto"><span class="uhui-sw-t"></span></label>
+                            <div><label>Autoplay de tr&aacute;iler</label><div class="uhui-hint">Reproduce el tr&aacute;iler de fondo en mute</div></div>
                         </div>
                         <div class="uhui-field">
                             <label>Intervalo de rotaci&oacute;n (seg)</label>
@@ -205,9 +211,7 @@
             <div id="panel-sections" class="uhui-panel">
                 <div class="uhui-group">
                     <div class="uhui-group-title">Secciones de la pantalla de inicio</div>
-                    <div class="uhui-hint" style="margin-bottom:1rem">
-                        Peso (menor = primero), tipo de tarjeta, l&iacute;mites y visibilidad por secci&oacute;n.
-                    </div>
+                    <div class="uhui-hint" style="margin-bottom:1rem">Peso (menor = primero), tipo de tarjeta, l&iacute;mites y visibilidad por secci&oacute;n.</div>
                     <div id="secBox"></div>
                     <button type="button" class="uhui-btn uhui-btn--s uhui-btn--sm" id="btnAddSec" style="margin-top:.75rem">+ A&ntilde;adir secci&oacute;n personalizada</button>
                 </div>
@@ -217,21 +221,17 @@
             <div id="panel-tabs" class="uhui-panel">
                 <div class="uhui-group">
                     <div class="uhui-group-title">Pesta&ntilde;as de navegaci&oacute;n superior</div>
-                    <div class="uhui-hint" style="margin-bottom:1rem">Crea y reordena las pesta&ntilde;as de arriba.</div>
-                    <div class="uhui-tab-hdr">
-                        <span>Nombre</span><span>Tipo</span><span>Destino</span><span>Orden</span><span>Visible</span><span></span>
-                    </div>
+                    <div class="uhui-hint" style="margin-bottom:1rem">Crea y reordena las pesta&ntilde;as de la parte superior.</div>
+                    <div class="uhui-tab-hdr"><span>Nombre</span><span>Tipo</span><span>Destino</span><span>Orden</span><span>Vis.</span><span></span></div>
                     <div id="tabBox"></div>
                     <button type="button" class="uhui-btn uhui-btn--s uhui-btn--sm" id="btnAddTab" style="margin-top:.75rem">+ A&ntilde;adir pesta&ntilde;a</button>
                 </div>
             </div>
 
-            <!-- ══ ACTIONS ══ -->
             <div class="uhui-actions">
                 <button type="button" class="uhui-btn uhui-btn--p" id="btnSave">Guardar configuraci&oacute;n</button>
                 <button type="button" class="uhui-btn uhui-btn--s" id="btnReset">Restablecer todo</button>
             </div>
-
             <div class="uhui-toast" id="uhuiToast"></div>
         </div>
     </div>
@@ -239,7 +239,6 @@
     <script type="text/javascript">
     (function () {
         'use strict';
-
         var PID = '0736fda4-7484-4372-8ce0-9d959232d19c';
         var page = document.querySelector('#ultimateHomeUIConfigPage');
         var cfg = null;
@@ -248,38 +247,25 @@
         var HIDEW = [{v:0,l:'Heredar global'},{v:1,l:'Mostrar siempre'},{v:2,l:'Ocultar siempre'}];
         var TTYPES = [{v:0,l:'Inicio'},{v:1,l:'Colecci\u00f3n'},{v:2,l:'G\u00e9nero'},{v:3,l:'Playlist'},{v:4,l:'Mi Lista'},{v:5,l:'Biblioteca'}];
 
-        /* ── API helpers ── */
-        function apiGet() {
-            return ApiClient.getJSON(ApiClient.getUrl('Plugins/' + PID + '/Configuration'));
-        }
+        function apiGet() { return ApiClient.getJSON(ApiClient.getUrl('Plugins/' + PID + '/Configuration')); }
+        function apiSave(d) { return ApiClient.ajax({ url: ApiClient.getUrl('Plugins/' + PID + '/Configuration'), type: 'POST', contentType: 'application/json', data: JSON.stringify(d) }); }
 
-        function apiSave(data) {
-            return ApiClient.ajax({
-                url: ApiClient.getUrl('Plugins/' + PID + '/Configuration'),
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data)
-            });
-        }
-
-        /* ── Tab switching ── */
+        /* ── Tabs ── */
         page.querySelector('#uhuiTabs').addEventListener('click', function (e) {
-            var btn = e.target.closest('.uhui-tab');
-            if (!btn) return;
+            var btn = e.target.closest('.uhui-tab'); if (!btn) return;
             page.querySelectorAll('.uhui-tab').forEach(function (t) { t.classList.remove('uhui-tab--active'); });
             page.querySelectorAll('.uhui-panel').forEach(function (p) { p.classList.remove('uhui-panel--active'); });
             btn.classList.add('uhui-tab--active');
             page.querySelector('#panel-' + btn.getAttribute('data-panel')).classList.add('uhui-panel--active');
         });
 
-        /* ── Hero source toggle ── */
-        page.querySelector('#cfgHeroSrc').addEventListener('change', function () { heroFields(this.value); });
-        function heroFields(v) {
-            page.querySelector('#fldHeroCollection').style.display = v === '2' ? '' : 'none';
-            page.querySelector('#fldHeroGenre').style.display = v === '3' ? '' : 'none';
+        page.querySelector('#cfgHeroSrc').addEventListener('change', function () { heroFld(this.value); });
+        function heroFld(v) {
+            page.querySelector('#fldHeroCol').style.display = v === 'Collection' ? '' : 'none';
+            page.querySelector('#fldHeroGen').style.display = v === 'Genre' ? '' : 'none';
         }
 
-        /* ── Load config ── */
+        /* ── Load ── */
         page.addEventListener('pageshow', function () { loadCfg(); });
 
         function loadCfg() {
@@ -287,62 +273,55 @@
                 cfg = c;
                 page.querySelector('#cfgEnable').checked = c.EnableCustomLayout;
                 page.querySelector('#cfgHideWatched').checked = c.HideWatchedGlobally;
-                page.querySelector('#cfgMaxSections').value = c.MaxSectionsVisible || 15;
-                page.querySelector('#cfgTieBreaking').value = c.DefaultTieBreakingStrategy || 0;
+                page.querySelector('#cfgMaxSec').value = c.MaxSectionsVisible || 15;
+                page.querySelector('#cfgTie').value = String(c.DefaultTieBreakingStrategy || 'Random');
                 page.querySelector('#cfgHeroOn').checked = c.HeroSliderEnabled;
-                page.querySelector('#cfgHeroSrc').value = c.HeroSliderSource || 0;
+                page.querySelector('#cfgHeroSrc').value = String(c.HeroSliderSource || 'LatestAdded');
                 page.querySelector('#cfgHeroMax').value = c.HeroSliderMaxItems || 5;
                 page.querySelector('#cfgHeroAuto').checked = c.HeroSliderAutoPlayTrailer !== false;
                 page.querySelector('#cfgHeroInt').value = c.HeroSliderIntervalSeconds || 8;
                 page.querySelector('#cfgHeroColId').value = c.HeroSliderCollectionId || '';
                 page.querySelector('#cfgHeroGenre').value = c.HeroSliderGenreName || '';
-                heroFields(String(c.HeroSliderSource || 0));
-                drawSections(c.Sections || []);
+                heroFld(String(c.HeroSliderSource || 'LatestAdded'));
+                drawSecs(c.Sections || []);
                 drawTabs(c.Tabs || []);
-                toast('Configuraci\u00f3n cargada', false);
-            }, function (err) {
-                toast('Error al cargar: ' + err, true);
-            });
+                toast('Configuraci\u00f3n cargada');
+                activateHomeInjector();
+            }, function (e) { toast('Error: ' + e, true); });
         }
 
         /* ── Draw sections ── */
-        function drawSections(secs) {
-            var box = page.querySelector('#secBox');
-            box.innerHTML = '';
+        function drawSecs(secs) {
+            var box = page.querySelector('#secBox'); box.innerHTML = '';
             secs.forEach(function (s, i) {
                 var d = document.createElement('div');
                 d.className = 'uhui-card' + (s.IsBuiltIn ? '' : ' uhui-card--custom');
                 d.setAttribute('data-i', i);
-
                 var badge = s.IsBuiltIn ? '<span class="uhui-badge uhui-badge--b">Integrada</span>' : '<span class="uhui-badge uhui-badge--c">Custom</span>';
-                var del = s.IsBuiltIn ? '' : '<button type="button" class="uhui-del js-del-sec">&times;</button>';
-                var nameHtml = s.IsBuiltIn
+                var del = s.IsBuiltIn ? '' : '<button type="button" class="uhui-del js-delsec">&times;</button>';
+                var nm = s.IsBuiltIn
                     ? '<h4>' + esc(s.DisplayName) + ' ' + badge + '</h4>'
-                    : '<h4><input type="text" class="js-sname" value="' + attr(s.DisplayName) + '" style="background:0;border:0;color:#eee;font-weight:700;font-size:.95rem;padding:0;width:auto"> ' + badge + '</h4>';
-
+                    : '<h4><input type="text" class="js-sn" value="' + at(s.DisplayName) + '" style="background:0;border:0;color:#eee;font-weight:700;font-size:.95rem;padding:0;width:160px"> ' + badge + '</h4>';
                 d.innerHTML =
-                    '<div class="uhui-card-head">' + nameHtml + '<div style="display:flex;align-items:center;gap:.5rem">' + del +
-                    '<label class="uhui-switch"><input type="checkbox" class="js-svis"' + (s.IsVisible !== false ? ' checked' : '') + '><span class="uhui-switch-track"></span></label>' +
-                    '</div></div>' +
+                    '<div class="uhui-card-head">' + nm + '<div style="display:flex;align-items:center;gap:.5rem">' + del +
+                    '<label class="uhui-sw"><input type="checkbox" class="js-sv"' + (s.IsVisible !== false ? ' checked' : '') + '><span class="uhui-sw-t"></span></label></div></div>' +
                     '<div class="uhui-card-fields">' +
                         '<div><label>Peso</label><input type="number" class="js-sw" min="0" max="100" value="' + (s.Weight||0) + '"></div>' +
                         '<div><label>Tarjeta</label><select class="js-sc">' + opts(CARDS, s.CardType) + '</select></div>' +
-                        '<div><label>M\u00edn</label><input type="number" class="js-smin" min="0" max="100" value="' + (s.MinItems||0) + '"></div>' +
-                        '<div><label>M\u00e1x</label><input type="number" class="js-smax" min="1" max="100" value="' + (s.MaxItems||25) + '"></div>' +
+                        '<div><label>M\u00edn</label><input type="number" class="js-smn" min="0" max="100" value="' + (s.MinItems||0) + '"></div>' +
+                        '<div><label>M\u00e1x</label><input type="number" class="js-smx" min="1" max="100" value="' + (s.MaxItems||25) + '"></div>' +
                         '<div><label>Ocultar visto</label><select class="js-sh">' + opts(HIDEW, s.HideWatchedOverride) + '</select></div>' +
-                    '</div>' +
-                    (s.IsBuiltIn ? '' : queryHtml(s));
-
+                    '</div>' + (s.IsBuiltIn ? '' : qHtml(s));
                 box.appendChild(d);
             });
         }
 
-        function queryHtml(s) {
+        function qHtml(s) {
             return '<details class="uhui-query"><summary>Filtros de consulta</summary><div class="uhui-query-grid">' +
-                '<div><label>Tipo de medio</label><input type="text" class="js-qm" value="' + attr(s.MediaTypes||'Movie') + '" placeholder="Movie, Series"></div>' +
-                '<div><label>G\u00e9neros</label><input type="text" class="js-qg" value="' + attr(s.Genres) + '" placeholder="Terror, Comedia"></div>' +
-                '<div><label>Estudios</label><input type="text" class="js-qs" value="' + attr(s.Studios) + '" placeholder="Marvel Studios"></div>' +
-                '<div><label>Tags</label><input type="text" class="js-qt" value="' + attr(s.Tags) + '"></div>' +
+                '<div><label>Tipo de medio</label><input type="text" class="js-qm" value="' + at(s.MediaTypes||'Movie') + '" placeholder="Movie, Series"></div>' +
+                '<div><label>G\u00e9neros</label><input type="text" class="js-qg" value="' + at(s.Genres) + '" placeholder="Terror, Comedia"></div>' +
+                '<div><label>Estudios</label><input type="text" class="js-qs" value="' + at(s.Studios) + '" placeholder="Marvel Studios"></div>' +
+                '<div><label>Tags</label><input type="text" class="js-qt" value="' + at(s.Tags) + '"></div>' +
                 '<div><label>A\u00f1o m\u00edn</label><input type="number" class="js-qy1" value="' + (s.MinYear||'') + '"></div>' +
                 '<div><label>A\u00f1o m\u00e1x</label><input type="number" class="js-qy2" value="' + (s.MaxYear||'') + '"></div>' +
                 '<div><label>Rating m\u00edn</label><input type="number" class="js-qr" step="0.1" value="' + (s.MinRating||'') + '"></div>' +
@@ -356,136 +335,105 @@
                 '<div><label>Direcci\u00f3n</label><select class="js-qsd">' +
                     '<option value="0"' + (s.SortDirection===0?' selected':'') + '>Ascendente</option>' +
                     '<option value="1"' + (s.SortDirection!==0?' selected':'') + '>Descendente</option>' +
-                '</select></div>' +
-            '</div></details>';
+                '</select></div></div></details>';
         }
 
         page.querySelector('#secBox').addEventListener('click', function (e) {
-            if (!e.target.classList.contains('js-del-sec')) return;
-            var i = parseInt(e.target.closest('.uhui-card').getAttribute('data-i'));
-            cfg.Sections.splice(i, 1);
-            drawSections(cfg.Sections);
+            if (!e.target.classList.contains('js-delsec')) return;
+            cfg.Sections.splice(parseInt(e.target.closest('.uhui-card').getAttribute('data-i')), 1);
+            drawSecs(cfg.Sections);
         });
 
         /* ── Draw tabs ── */
         function drawTabs(tabs) {
-            var box = page.querySelector('#tabBox');
-            box.innerHTML = '';
+            var box = page.querySelector('#tabBox'); box.innerHTML = '';
             tabs.forEach(function (t, i) {
-                var r = document.createElement('div');
-                r.className = 'uhui-tab-row';
-                r.setAttribute('data-i', i);
+                var r = document.createElement('div'); r.className = 'uhui-tab-row'; r.setAttribute('data-i', i);
                 r.innerHTML =
-                    '<input type="text" class="js-tl" value="' + attr(t.Label) + '" placeholder="Nombre">' +
+                    '<input type="text" class="js-tl" value="' + at(t.Label) + '" placeholder="Nombre">' +
                     '<select class="js-tt">' + opts(TTYPES, t.LinkType) + '</select>' +
-                    '<input type="text" class="js-td" value="' + attr(t.TargetId || t.GenreName || '') + '" placeholder="ID o nombre">' +
+                    '<input type="text" class="js-td" value="' + at(t.TargetId || t.GenreName || '') + '" placeholder="ID o nombre">' +
                     '<input type="number" class="js-to" min="0" max="100" value="' + (t.Order||0) + '">' +
-                    '<label class="uhui-switch" style="margin:0 auto"><input type="checkbox" class="js-tv"' + (t.IsVisible!==false?' checked':'') + '><span class="uhui-switch-track"></span></label>' +
-                    '<button type="button" class="uhui-del js-del-tab">&times;</button>';
+                    '<label class="uhui-sw" style="margin:0 auto"><input type="checkbox" class="js-tv"' + (t.IsVisible!==false?' checked':'') + '><span class="uhui-sw-t"></span></label>' +
+                    '<button type="button" class="uhui-del js-deltab">&times;</button>';
                 box.appendChild(r);
             });
         }
 
         page.querySelector('#tabBox').addEventListener('click', function (e) {
-            if (!e.target.classList.contains('js-del-tab')) return;
-            var i = parseInt(e.target.closest('.uhui-tab-row').getAttribute('data-i'));
-            cfg.Tabs.splice(i, 1);
+            if (!e.target.classList.contains('js-deltab')) return;
+            cfg.Tabs.splice(parseInt(e.target.closest('.uhui-tab-row').getAttribute('data-i')), 1);
             drawTabs(cfg.Tabs);
         });
 
-        /* ── Add section ── */
+        /* ── Add ── */
         page.querySelector('#btnAddSec').addEventListener('click', function () {
             if (!cfg) return;
             var mw = (cfg.Sections||[]).reduce(function (m, s) { return Math.max(m, s.Weight||0); }, 0);
-            cfg.Sections.push({
-                SectionId: 'custom_' + Date.now(), DisplayName: 'Nueva secci\u00f3n', Weight: mw+1,
-                IsVisible: true, CardType: 2, MinItems: 0, MaxItems: 25, HideWatchedOverride: 0,
-                IsBuiltIn: false, MediaTypes: 'Movie', Genres: '', Studios: '', Tags: '',
-                MinYear: 0, MaxYear: 0, MinRating: 0, SortBy: 'DateCreated', SortDirection: 1
-            });
-            drawSections(cfg.Sections);
+            cfg.Sections.push({ SectionId:'custom_'+Date.now(), DisplayName:'Nueva secci\u00f3n', Weight:mw+1, IsVisible:true, CardType:2, MinItems:0, MaxItems:25, HideWatchedOverride:0, IsBuiltIn:false, MediaTypes:'Movie', Genres:'', Studios:'', Tags:'', MinYear:0, MaxYear:0, MinRating:0, SortBy:'DateCreated', SortDirection:1 });
+            drawSecs(cfg.Sections);
         });
-
-        /* ── Add tab ── */
         page.querySelector('#btnAddTab').addEventListener('click', function () {
             if (!cfg) return;
             var mo = (cfg.Tabs||[]).reduce(function (m, t) { return Math.max(m, t.Order||0); }, 0);
-            cfg.Tabs.push({ TabId: 'tab_' + Date.now(), Label: 'Nueva', LinkType: 0, TargetId: '', GenreName: '', Order: mo+1, IsVisible: true });
+            cfg.Tabs.push({ TabId:'tab_'+Date.now(), Label:'Nueva', LinkType:0, TargetId:'', GenreName:'', Order:mo+1, IsVisible:true });
             drawTabs(cfg.Tabs);
         });
 
         /* ── SAVE ── */
         page.querySelector('#btnSave').addEventListener('click', function () {
-            if (!cfg) { toast('A\u00fan no ha cargado la configuraci\u00f3n', true); return; }
-            var btn = this;
-            btn.disabled = true; btn.textContent = 'Guardando...';
-
+            if (!cfg) { toast('A\u00fan no cargada', true); return; }
+            var btn = this; btn.disabled = true; btn.textContent = 'Guardando...';
             cfg.EnableCustomLayout = page.querySelector('#cfgEnable').checked;
             cfg.HideWatchedGlobally = page.querySelector('#cfgHideWatched').checked;
-            cfg.MaxSectionsVisible = parseInt(page.querySelector('#cfgMaxSections').value) || 15;
-            cfg.DefaultTieBreakingStrategy = parseInt(page.querySelector('#cfgTieBreaking').value) || 0;
+            cfg.MaxSectionsVisible = parseInt(page.querySelector('#cfgMaxSec').value) || 15;
+            cfg.DefaultTieBreakingStrategy = page.querySelector('#cfgTie').value;
             cfg.HeroSliderEnabled = page.querySelector('#cfgHeroOn').checked;
-            cfg.HeroSliderSource = parseInt(page.querySelector('#cfgHeroSrc').value) || 0;
+            cfg.HeroSliderSource = page.querySelector('#cfgHeroSrc').value;
             cfg.HeroSliderMaxItems = parseInt(page.querySelector('#cfgHeroMax').value) || 5;
             cfg.HeroSliderAutoPlayTrailer = page.querySelector('#cfgHeroAuto').checked;
             cfg.HeroSliderIntervalSeconds = parseInt(page.querySelector('#cfgHeroInt').value) || 8;
             cfg.HeroSliderCollectionId = page.querySelector('#cfgHeroColId').value.trim();
             cfg.HeroSliderGenreName = page.querySelector('#cfgHeroGenre').value.trim();
             cfg.Sections = readSecs();
-            cfg.Tabs = readTabs();
-
+            cfg.Tabs = readTabsFn();
             apiSave(cfg).then(function () {
-                toast('Configuraci\u00f3n guardada');
-                btn.disabled = false; btn.textContent = 'Guardar configuraci\u00f3n';
-            }, function (err) {
-                toast('Error: ' + String(err), true);
-                btn.disabled = false; btn.textContent = 'Guardar configuraci\u00f3n';
+                toast('Configuraci\u00f3n guardada'); btn.disabled = false; btn.textContent = 'Guardar configuraci\u00f3n';
+            }, function (e) {
+                toast('Error: ' + String(e), true); btn.disabled = false; btn.textContent = 'Guardar configuraci\u00f3n';
             });
         });
 
         function readSecs() {
             var out = [];
             page.querySelectorAll('#secBox .uhui-card').forEach(function (d, i) {
-                var orig = cfg.Sections[i] || {};
-                var n = d.querySelector('.js-sname');
-                var s = {
-                    SectionId: orig.SectionId || 'custom_' + i,
-                    DisplayName: n ? n.value.trim() : (orig.DisplayName || orig.SectionId),
-                    Weight: parseInt(d.querySelector('.js-sw').value) || 0,
-                    IsVisible: d.querySelector('.js-svis').checked,
-                    CardType: parseInt(d.querySelector('.js-sc').value),
-                    MinItems: parseInt(d.querySelector('.js-smin').value) || 0,
-                    MaxItems: parseInt(d.querySelector('.js-smax').value) || 25,
-                    HideWatchedOverride: parseInt(d.querySelector('.js-sh').value) || 0,
-                    IsBuiltIn: orig.IsBuiltIn !== false,
-                    MediaTypes: orig.MediaTypes || 'Movie', Genres: orig.Genres || '', Studios: orig.Studios || '',
-                    Tags: orig.Tags || '', MinYear: orig.MinYear||0, MaxYear: orig.MaxYear||0, MinRating: orig.MinRating||0,
-                    SortBy: orig.SortBy || 'DateCreated', SortDirection: orig.SortDirection != null ? orig.SortDirection : 1
-                };
+                var o = cfg.Sections[i] || {}; var n = d.querySelector('.js-sn');
+                var s = { SectionId:o.SectionId||'c'+i, DisplayName:n?n.value.trim():(o.DisplayName||o.SectionId),
+                    Weight:parseInt(d.querySelector('.js-sw').value)||0, IsVisible:d.querySelector('.js-sv').checked,
+                    CardType:parseInt(d.querySelector('.js-sc').value), MinItems:parseInt(d.querySelector('.js-smn').value)||0,
+                    MaxItems:parseInt(d.querySelector('.js-smx').value)||25, HideWatchedOverride:parseInt(d.querySelector('.js-sh').value)||0,
+                    IsBuiltIn:o.IsBuiltIn!==false, MediaTypes:o.MediaTypes||'Movie', Genres:o.Genres||'', Studios:o.Studios||'',
+                    Tags:o.Tags||'', MinYear:o.MinYear||0, MaxYear:o.MaxYear||0, MinRating:o.MinRating||0,
+                    SortBy:o.SortBy||'DateCreated', SortDirection:o.SortDirection!=null?o.SortDirection:1 };
                 if (!s.IsBuiltIn) {
-                    var q = function (c) { var el = d.querySelector(c); return el ? el.value.trim() : ''; };
-                    s.MediaTypes = q('.js-qm') || 'Movie';
-                    s.Genres = q('.js-qg'); s.Studios = q('.js-qs'); s.Tags = q('.js-qt');
-                    s.MinYear = parseInt(q('.js-qy1')) || 0; s.MaxYear = parseInt(q('.js-qy2')) || 0;
-                    s.MinRating = parseFloat(q('.js-qr')) || 0; s.SortBy = q('.js-qsb') || 'DateCreated';
-                    s.SortDirection = parseInt(d.querySelector('.js-qsd').value);
+                    var q = function(c){var el=d.querySelector(c);return el?el.value.trim():'';};
+                    s.MediaTypes=q('.js-qm')||'Movie'; s.Genres=q('.js-qg'); s.Studios=q('.js-qs'); s.Tags=q('.js-qt');
+                    s.MinYear=parseInt(q('.js-qy1'))||0; s.MaxYear=parseInt(q('.js-qy2'))||0;
+                    s.MinRating=parseFloat(q('.js-qr'))||0; s.SortBy=q('.js-qsb')||'DateCreated';
+                    s.SortDirection=parseInt(d.querySelector('.js-qsd').value);
                 }
                 out.push(s);
             });
             return out;
         }
 
-        function readTabs() {
+        function readTabsFn() {
             var out = [];
             page.querySelectorAll('#tabBox .uhui-tab-row').forEach(function (r, i) {
-                var orig = cfg.Tabs[i] || {};
-                var lt = parseInt(r.querySelector('.js-tt').value);
-                var tgt = r.querySelector('.js-td').value.trim();
-                out.push({
-                    TabId: orig.TabId || 'tab_' + i, Label: r.querySelector('.js-tl').value.trim() || 'Sin nombre',
-                    LinkType: lt, TargetId: lt !== 2 ? tgt : '', GenreName: lt === 2 ? tgt : '',
-                    Order: parseInt(r.querySelector('.js-to').value) || 0, IsVisible: r.querySelector('.js-tv').checked
-                });
+                var o = cfg.Tabs[i] || {}; var lt = parseInt(r.querySelector('.js-tt').value); var tgt = r.querySelector('.js-td').value.trim();
+                out.push({ TabId:o.TabId||'t'+i, Label:r.querySelector('.js-tl').value.trim()||'Sin nombre',
+                    LinkType:lt, TargetId:lt!==2?tgt:'', GenreName:lt===2?tgt:'',
+                    Order:parseInt(r.querySelector('.js-to').value)||0, IsVisible:r.querySelector('.js-tv').checked });
             });
             return out;
         }
@@ -493,9 +441,8 @@
         /* ── RESET ── */
         page.querySelector('#btnReset').addEventListener('click', function () {
             if (!confirm('\u00bfRestablecer toda la configuraci\u00f3n?')) return;
-            var def = {
-                EnableCustomLayout:true, HideWatchedGlobally:false, MaxSectionsVisible:15, DefaultTieBreakingStrategy:0,
-                HeroSliderEnabled:true, HeroSliderSource:0, HeroSliderMaxItems:5, HeroSliderAutoPlayTrailer:true,
+            var def = { EnableCustomLayout:true, HideWatchedGlobally:false, MaxSectionsVisible:15, DefaultTieBreakingStrategy:'Random',
+                HeroSliderEnabled:true, HeroSliderSource:'LatestAdded', HeroSliderMaxItems:5, HeroSliderAutoPlayTrailer:true,
                 HeroSliderIntervalSeconds:8, HeroSliderCollectionId:'', HeroSliderGenreName:'',
                 Sections:[
                     {SectionId:'ContinueWatching',DisplayName:'Continuar viendo',Weight:1,IsVisible:true,CardType:3,MinItems:0,MaxItems:25,HideWatchedOverride:0,IsBuiltIn:true,MediaTypes:'Movie',Genres:'',Studios:'',Tags:'',MinYear:0,MaxYear:0,MinRating:0,SortBy:'DateCreated',SortDirection:1},
@@ -506,24 +453,30 @@
                     {SectionId:'HiddenGems',DisplayName:'Joyas ocultas',Weight:6,IsVisible:true,CardType:2,MinItems:0,MaxItems:25,HideWatchedOverride:0,IsBuiltIn:true,MediaTypes:'Movie',Genres:'',Studios:'',Tags:'',MinYear:0,MaxYear:0,MinRating:0,SortBy:'DateCreated',SortDirection:1},
                     {SectionId:'TimeSlotSuggestions',DisplayName:'Sugerencias por horario',Weight:7,IsVisible:true,CardType:1,MinItems:0,MaxItems:25,HideWatchedOverride:0,IsBuiltIn:true,MediaTypes:'Movie',Genres:'',Studios:'',Tags:'',MinYear:0,MaxYear:0,MinRating:0,SortBy:'DateCreated',SortDirection:1}
                 ],
-                Tabs:[
-                    {TabId:'home',Label:'Inicio',LinkType:0,TargetId:'',GenreName:'',Order:0,IsVisible:true},
-                    {TabId:'favorites',Label:'Mis favoritos',LinkType:4,TargetId:'',GenreName:'',Order:1,IsVisible:true}
-                ]
-            };
-            apiSave(def).then(function () { loadCfg(); toast('Restablecido'); }, function (e) { toast('Error: ' + e, true); });
+                Tabs:[ {TabId:'home',Label:'Inicio',LinkType:0,TargetId:'',GenreName:'',Order:0,IsVisible:true},
+                    {TabId:'favorites',Label:'Mis favoritos',LinkType:4,TargetId:'',GenreName:'',Order:1,IsVisible:true} ] };
+            apiSave(def).then(function () { loadCfg(); toast('Restablecido'); }, function (e) { toast('Error: '+e, true); });
         });
 
+        /* ── Home injector activation ── */
+        function activateHomeInjector() {
+            if (document.getElementById('uhui-injector-script')) return;
+            var s = document.createElement('script');
+            s.id = 'uhui-injector-script';
+            s.type = 'module';
+            s.textContent = "import('/UltimateHomeUI/Web/interceptor.js').then(function(m){m.init();}).catch(function(e){console.error('[UHUI] Failed to load interceptor:',e);});";
+            document.head.appendChild(s);
+        }
+
         /* ── Helpers ── */
-        function opts(arr, sel) { return arr.map(function(o){ return '<option value="'+o.v+'"'+(o.v==sel?' selected':'')+'>'+esc(o.l)+'</option>'; }).join(''); }
+        function opts(a, s) { return a.map(function(o){ return '<option value="'+o.v+'"'+(o.v==s?' selected':'')+'>'+esc(o.l)+'</option>'; }).join(''); }
         function sel(a, b) { return a === b ? ' selected' : ''; }
         function esc(s) { var d = document.createElement('div'); d.textContent = s||''; return d.innerHTML; }
-        function attr(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+        function at(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
         function toast(m, err) {
-            var t = page.querySelector('#uhuiToast');
-            t.textContent = m;
+            var t = page.querySelector('#uhuiToast'); t.textContent = m;
             t.className = 'uhui-toast uhui-toast--show ' + (err ? 'uhui-toast--err' : 'uhui-toast--ok');
-            setTimeout(function () { t.className = 'uhui-toast'; }, 3500);
+            setTimeout(function(){ t.className = 'uhui-toast'; }, 3500);
         }
     })();
     </script>
