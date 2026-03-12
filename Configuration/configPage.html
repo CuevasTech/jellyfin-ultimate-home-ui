@@ -122,6 +122,9 @@
             <div class="uhui-header">
                 <h2>Ultimate Home UI</h2>
                 <small>Configuraci&oacute;n completa del plugin</small>
+                <div id="uhuiInjectionStatus" style="margin-top:.6rem;padding:.5rem .85rem;border-radius:6px;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:.5rem;background:#1a2a1a;color:#4ade80;border:1px solid #166534;">
+                    <span>&#10003;</span> Script inyectado en Jellyfin &mdash; el layout personalizado se carga autom&aacute;ticamente
+                </div>
             </div>
 
             <div class="uhui-tabs" id="uhuiTabs">
@@ -286,7 +289,7 @@
                 drawSecs(c.Sections || []);
                 drawTabs(c.Tabs || []);
                 toast('Configuraci\u00f3n cargada');
-                activateHomeInjector();
+                checkInjectionStatus();
             }, function (e) { toast('Error: ' + e, true); });
         }
 
@@ -458,14 +461,24 @@
             apiSave(def).then(function () { loadCfg(); toast('Restablecido'); }, function (e) { toast('Error: '+e, true); });
         });
 
-        /* ── Home injector activation ── */
-        function activateHomeInjector() {
-            if (document.getElementById('uhui-injector-script')) return;
-            var s = document.createElement('script');
-            s.id = 'uhui-injector-script';
-            s.type = 'module';
-            s.textContent = "import('/UltimateHomeUI/Web/interceptor.js').then(function(m){m.init();}).catch(function(e){console.error('[UHUI] Failed to load interceptor:',e);});";
-            document.head.appendChild(s);
+        /* ── Injection status check ── */
+        function checkInjectionStatus() {
+            var statusEl = page.querySelector('#uhuiInjectionStatus');
+            if (!statusEl) return;
+            // Verifica si el script ya está activo en esta sesión (inyectado vía index.html)
+            var isActive = !!document.querySelector('script[src*="UltimateHomeUI/Web/plugin-entry.js"]')
+                        || typeof window.__uhui_active !== 'undefined';
+            if (isActive) {
+                statusEl.style.background = '#1a2a1a';
+                statusEl.style.color = '#4ade80';
+                statusEl.style.borderColor = '#166534';
+                statusEl.innerHTML = '<span>&#10003;</span> Script inyectado &mdash; layout personalizado activo';
+            } else {
+                statusEl.style.background = '#2a1a1a';
+                statusEl.style.color = '#f87171';
+                statusEl.style.borderColor = '#7f1d1d';
+                statusEl.innerHTML = '<span>&#9888;</span> Script pendiente &mdash; reinicia Jellyfin para activar el layout';
+            }
         }
 
         /* ── Helpers ── */

@@ -1,14 +1,11 @@
 /**
  * UHUI — Plugin Entry Point
- * Loaded by Jellyfin plugin API. Initializes the MutationObserver interceptor.
+ *
+ * Este módulo es inyectado directamente en el index.html de Jellyfin por
+ * WebInjectorService al arrancar el servidor. Se ejecuta automáticamente
+ * en CADA carga de página, garantizando que el interceptor siempre esté activo.
  */
-const UHUI_VERSION = '1.0.0';
 
-export default {
-  name: 'Jellyfin Ultimate Home UI',
-  version: UHUI_VERSION,
+import { init } from './interceptor.js';
 
-  initialize() {
-    import('./interceptor.js').then(m => m.init());
-  }
-};
+init();

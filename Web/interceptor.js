@@ -58,6 +58,9 @@ function injectStyles() {
 }
 
 export function init() {
+  // Marca global para que configPage.html pueda verificar que el script está activo.
+  window.__uhui_active = true;
+
   document.addEventListener('viewshow', () => {
     if (isHomePage()) {
       injected = false;
