@@ -7,8 +7,8 @@
   "category": "UI",
   "versions": [
     {
-      "version": "1.3.0.0",
-      "changelog": "Fix dropdowns, colores rosa/azul, campos sin solapar, controller para servir JS del frontend, activación del home injector.",
+      "version": "1.4.0.0",
+      "changelog": "Inyección real del script en index.html al arrancar Jellyfin (misma técnica que plugins como Custom JavaScript). El layout personalizado ahora se carga automáticamente sin necesidad de visitar la configuración.",
       "targetAbi": "10.11.0.0",
       "sourceUrl": "",
       "checksum": "",

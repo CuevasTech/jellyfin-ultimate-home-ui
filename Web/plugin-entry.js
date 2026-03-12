@@ -1,11 +1,8 @@
 /**
  * UHUI — Plugin Entry Point
- *
- * Este módulo es inyectado directamente en el index.html de Jellyfin por
- * WebInjectorService al arrancar el servidor. Se ejecuta automáticamente
- * en CADA carga de página, garantizando que el interceptor siempre esté activo.
+ * Loaded as a <script type="module"> injected into Jellyfin's index.html.
+ * Dynamically imports the interceptor and starts the DOM observer.
  */
-
-import { init } from './interceptor.js';
-
-init();
+import('./interceptor.js')
+  .then(({ init }) => init())
+  .catch(e => console.error('[UHUI] Failed to initialize:', e));

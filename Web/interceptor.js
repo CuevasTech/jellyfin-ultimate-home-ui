@@ -2,6 +2,10 @@
  * UHUI — DOM Interceptor
  * Uses MutationObserver to detect when Jellyfin renders the Home page,
  * then replaces it with the custom Netflix-style layout.
+ *
+ * Jellyfin is a SPA — navigations don't trigger full page reloads.
+ * We rely on MutationObserver + the custom 'viewshow' / 'viewhide' events
+ * that Jellyfin's internal router fires (they bubble up to document).
  */
 
 import { injectLayout, destroyLayout } from './layout.js';
@@ -10,17 +14,18 @@ let attached = false;
 let injected = false;
 
 function isHomePage() {
-  return location.hash.includes('home') ||
-         location.pathname.includes('/home') ||
-         !!document.querySelector('.homePage');
+  if (document.querySelector('.homePage')) return true;
+  const hash = location.hash.replace(/^#!?/, '');
+  return hash === '/home.html' || hash === '/home' || hash === '/' || hash === '';
 }
 
 function checkHome(mutations, obs) {
   for (const m of mutations) {
     for (const node of m.addedNodes) {
       if (node.nodeType !== Node.ELEMENT_NODE) continue;
-      const home = node.matches && node.matches('.homePage') ? node
-                 : node.querySelector && node.querySelector('.homePage');
+      const home = (node.matches && node.matches('.homePage'))
+        ? node
+        : (node.querySelector && node.querySelector('.homePage'));
       if (home) {
         obs.disconnect();
         attached = false;
@@ -58,13 +63,15 @@ function injectStyles() {
 }
 
 export function init() {
-  // Marca global para que configPage.html pueda verificar que el script está activo.
   window.__uhui_active = true;
 
   document.addEventListener('viewshow', () => {
     if (isHomePage()) {
       injected = false;
       attachObserver();
+
+      const home = document.querySelector('.homePage');
+      if (home) handleHomeFound(home);
     }
   });
 
@@ -72,6 +79,13 @@ export function init() {
     if (injected) {
       injected = false;
       destroyLayout();
+    }
+  });
+
+  window.addEventListener('hashchange', () => {
+    if (isHomePage()) {
+      injected = false;
+      attachObserver();
     }
   });
 
@@ -85,4 +99,6 @@ export function init() {
   } else {
     attachObserver();
   }
+
+  console.log('[UHUI] Interceptor active — watching for Home page');
 }
