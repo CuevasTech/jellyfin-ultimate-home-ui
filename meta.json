@@ -7,12 +7,12 @@
   "category": "UI",
   "versions": [
     {
-      "version": "1.4.0.0",
-      "changelog": "Inyección real del script en index.html al arrancar Jellyfin (misma técnica que plugins como Custom JavaScript). El layout personalizado ahora se carga automáticamente sin necesidad de visitar la configuración.",
+      "version": "1.5.0.0",
+      "changelog": "Corrige duplicacion automatica de secciones/pestanas al reiniciar Jellyfin (bug XmlSerializer). Mejora la deteccion del home con polling multi-capa. Retry de autenticacion en layout. Deduplicacion automatica de configs corruptas.",
       "targetAbi": "10.11.0.0",
-      "sourceUrl": "",
-      "checksum": "",
-      "timestamp": "2026-03-12T00:00:00Z"
+      "sourceUrl": "https://github.com/CuevasTech/jellyfin-ultimate-home-ui/releases/download/v1.5.0/Jellyfin.Plugin.UltimateHomeUI.zip",
+      "checksum": "e4aa679f049a5766935cad008a78634c",
+      "timestamp": "2026-03-13T00:00:00Z"
     }
   ]
 }
