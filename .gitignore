@@ -3,6 +3,8 @@ bin/
 obj/
 out/
 dist/
+publish/
+*.zip
 
 # NuGet
 *.nupkg

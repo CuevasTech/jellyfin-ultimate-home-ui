@@ -7,11 +7,11 @@
   "category": "UI",
   "versions": [
     {
-      "version": "1.5.1.0",
-      "changelog": "Fix carga del plugin: constructor defensivo con null checks y try/catch. Rebuild limpio del ZIP.",
+      "version": "1.5.2.0",
+      "changelog": "Fix duplicacion de secciones, interceptor robusto, constructor defensivo.",
       "targetAbi": "10.11.0.0",
-      "sourceUrl": "https://github.com/CuevasTech/jellyfin-ultimate-home-ui/releases/download/v1.5.1/Jellyfin.Plugin.UltimateHomeUI.zip",
-      "checksum": "533af0ceeab7f3605a6b8625e0925cad",
+      "sourceUrl": "",
+      "checksum": "",
       "timestamp": "2026-03-13T00:00:00Z"
     }
   ]
