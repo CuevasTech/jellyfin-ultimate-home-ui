@@ -7,11 +7,11 @@
   "category": "UI",
   "versions": [
     {
-      "version": "1.5.0.0",
-      "changelog": "Corrige duplicacion automatica de secciones/pestanas al reiniciar Jellyfin (bug XmlSerializer). Mejora la deteccion del home con polling multi-capa. Retry de autenticacion en layout. Deduplicacion automatica de configs corruptas.",
+      "version": "1.5.1.0",
+      "changelog": "Fix carga del plugin: constructor defensivo con null checks y try/catch. Rebuild limpio del ZIP.",
       "targetAbi": "10.11.0.0",
-      "sourceUrl": "https://github.com/CuevasTech/jellyfin-ultimate-home-ui/releases/download/v1.5.0/Jellyfin.Plugin.UltimateHomeUI.zip",
-      "checksum": "e4aa679f049a5766935cad008a78634c",
+      "sourceUrl": "https://github.com/CuevasTech/jellyfin-ultimate-home-ui/releases/download/v1.5.1/Jellyfin.Plugin.UltimateHomeUI.zip",
+      "checksum": "533af0ceeab7f3605a6b8625e0925cad",
       "timestamp": "2026-03-13T00:00:00Z"
     }
   ]

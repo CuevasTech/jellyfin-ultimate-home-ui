@@ -34,8 +34,23 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
         Instance = this;
         _logger = logger;
 
-        EnsureConfigurationDefaults();
-        InjectClientScript(applicationPaths, configurationManager);
+        try
+        {
+            EnsureConfigurationDefaults();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[UHUI] Error al inicializar defaults de configuración.");
+        }
+
+        try
+        {
+            InjectClientScript(applicationPaths, configurationManager);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[UHUI] Error al inyectar script en index.html.");
+        }
     }
 
     /// <inheritdoc />
@@ -91,7 +106,10 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
         var config = Configuration;
         var needsSave = false;
 
-        // Primer arranque: listas vacías → poblar con defaults de fábrica
+        // El XmlSerializer puede dejar las listas como null si el XML no las contiene
+        config.Sections ??= [];
+        config.Tabs ??= [];
+
         if (config.Sections.Count == 0)
         {
             config.Sections = PluginConfiguration.GetDefaultSections();
@@ -106,19 +124,17 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
             _logger.LogInformation("[UHUI] Pestañas por defecto inicializadas.");
         }
 
-        // Sanear configuración corrompida por el bug del XmlSerializer (listas duplicadas).
-        // Mantenemos el ÚLTIMO elemento de cada Id, que corresponde al valor guardado en XML
-        // y puede contener personalizaciones del usuario.
+        // Deduplicar listas corruptas (bug del XmlSerializer que añade en vez de reemplazar)
         var uniqueSections = config.Sections
+            .Where(s => !string.IsNullOrEmpty(s?.SectionId))
             .GroupBy(s => s.SectionId)
-            .Where(g => !string.IsNullOrEmpty(g.Key))
             .Select(g => g.Last())
             .ToList();
 
         if (uniqueSections.Count != config.Sections.Count)
         {
             _logger.LogWarning(
-                "[UHUI] Secciones duplicadas detectadas ({Total} → {Unique}). Deduplicando y guardando.",
+                "[UHUI] Secciones duplicadas detectadas ({Total} → {Unique}). Deduplicando.",
                 config.Sections.Count,
                 uniqueSections.Count);
             config.Sections = uniqueSections;
@@ -126,15 +142,15 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
         }
 
         var uniqueTabs = config.Tabs
+            .Where(t => !string.IsNullOrEmpty(t?.TabId))
             .GroupBy(t => t.TabId)
-            .Where(g => !string.IsNullOrEmpty(g.Key))
             .Select(g => g.Last())
             .ToList();
 
         if (uniqueTabs.Count != config.Tabs.Count)
         {
             _logger.LogWarning(
-                "[UHUI] Pestañas duplicadas detectadas ({Total} → {Unique}). Deduplicando y guardando.",
+                "[UHUI] Pestañas duplicadas detectadas ({Total} → {Unique}). Deduplicando.",
                 config.Tabs.Count,
                 uniqueTabs.Count);
             config.Tabs = uniqueTabs;
