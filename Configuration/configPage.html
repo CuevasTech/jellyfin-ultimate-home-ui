@@ -4,239 +4,727 @@
     <meta charset="utf-8">
     <title>Ultimate Home UI</title>
     <style>
-        .uhui-config { max-width: 900px; margin: 0 auto; padding: 1rem; }
-        .uhui-config h2 { margin-top: 0; }
-        .uhui-config h3 { margin-top: 2rem; border-bottom: 1px solid #444; padding-bottom: 0.5rem; }
-        .uhui-field { margin-bottom: 1rem; }
-        .uhui-field label { display: block; margin-bottom: 0.3rem; font-weight: 600; }
-        .uhui-field select, .uhui-field input[type="number"] {
-            padding: 0.4rem 0.6rem; border: 1px solid #555; border-radius: 4px;
-            background: #1e1e1e; color: #eee; min-width: 200px;
+        :root {
+            --uhui-bg: #181818;
+            --uhui-card: #222;
+            --uhui-card-hover: #2a2a2a;
+            --uhui-border: #333;
+            --uhui-accent: #e50914;
+            --uhui-accent-hover: #ff1a26;
+            --uhui-text: #eee;
+            --uhui-text-muted: #999;
+            --uhui-success: #2ecc71;
+            --uhui-radius: 8px;
         }
-        .uhui-field input[type="checkbox"] { margin-right: 0.5rem; }
-        .uhui-sections-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-        .uhui-sections-table th, .uhui-sections-table td {
-            padding: 0.5rem; text-align: left; border-bottom: 1px solid #333;
+
+        .uhui { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; font-family: inherit; color: var(--uhui-text); }
+
+        /* ── Header ── */
+        .uhui-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; }
+        .uhui-header h2 { margin: 0; font-size: 1.5rem; font-weight: 700; }
+        .uhui-header small { color: var(--uhui-text-muted); font-size: 0.85rem; }
+
+        /* ── Tab nav ── */
+        .uhui-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--uhui-border); margin-bottom: 1.5rem; overflow-x: auto; }
+        .uhui-tab {
+            padding: 0.65rem 1.2rem; cursor: pointer; font-weight: 600; font-size: 0.9rem;
+            color: var(--uhui-text-muted); border-bottom: 3px solid transparent; transition: all 0.2s;
+            white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none;
         }
-        .uhui-sections-table th { font-size: 0.85rem; color: #aaa; }
-        .uhui-sections-table input[type="number"] { width: 60px; }
-        .uhui-btn { padding: 0.5rem 1.2rem; border: none; border-radius: 4px; cursor: pointer;
-            font-weight: 600; margin-right: 0.5rem; margin-top: 1rem; }
-        .uhui-btn--primary { background: #e50914; color: #fff; }
-        .uhui-btn--primary:hover { background: #ff1722; }
-        .uhui-btn--secondary { background: #333; color: #eee; }
+        .uhui-tab:hover { color: var(--uhui-text); }
+        .uhui-tab--active { color: var(--uhui-accent); border-bottom-color: var(--uhui-accent); }
+        .uhui-panel { display: none; }
+        .uhui-panel--active { display: block; }
+
+        /* ── Form fields ── */
+        .uhui-group { margin-bottom: 1.5rem; }
+        .uhui-group-title {
+            font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--uhui-accent); margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--uhui-border);
+        }
+        .uhui-field { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.3rem; }
+        .uhui-field--row { flex-direction: row; align-items: center; gap: 0.75rem; }
+        .uhui-field label { font-weight: 600; font-size: 0.9rem; }
+        .uhui-field .uhui-hint { font-size: 0.78rem; color: var(--uhui-text-muted); margin-top: 0.15rem; }
+        .uhui-field input[type="number"],
+        .uhui-field input[type="text"],
+        .uhui-field select {
+            padding: 0.5rem 0.7rem; border: 1px solid var(--uhui-border); border-radius: var(--uhui-radius);
+            background: var(--uhui-card); color: var(--uhui-text); font-size: 0.9rem; max-width: 320px; width: 100%;
+        }
+        .uhui-field input[type="number"] { max-width: 120px; }
+        .uhui-field input:focus, .uhui-field select:focus { outline: none; border-color: var(--uhui-accent); }
+        .uhui-check { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+        .uhui-check input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--uhui-accent); cursor: pointer; }
+
+        /* ── Toggle switch ── */
+        .uhui-toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .uhui-toggle input { opacity: 0; width: 0; height: 0; }
+        .uhui-toggle-slider {
+            position: absolute; inset: 0; background: #555; border-radius: 24px; cursor: pointer; transition: 0.25s;
+        }
+        .uhui-toggle-slider::before {
+            content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px;
+            background: #fff; border-radius: 50%; transition: 0.25s;
+        }
+        .uhui-toggle input:checked + .uhui-toggle-slider { background: var(--uhui-accent); }
+        .uhui-toggle input:checked + .uhui-toggle-slider::before { transform: translateX(20px); }
+
+        /* ── Inline grid ── */
+        .uhui-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+        .uhui-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 600px) { .uhui-grid-2 { grid-template-columns: 1fr; } }
+
+        /* ── Section cards ── */
+        .uhui-section-card {
+            background: var(--uhui-card); border: 1px solid var(--uhui-border); border-radius: var(--uhui-radius);
+            padding: 1rem; transition: border-color 0.2s;
+        }
+        .uhui-section-card:hover { border-color: #555; }
+        .uhui-section-card--custom { border-left: 3px solid var(--uhui-accent); }
+        .uhui-section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .uhui-section-head h4 { margin: 0; font-size: 0.95rem; }
+        .uhui-section-head .uhui-badge {
+            font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 10px; font-weight: 600;
+        }
+        .uhui-badge--builtin { background: #2d3748; color: #a0aec0; }
+        .uhui-badge--custom { background: #742a2a; color: #feb2b2; }
+        .uhui-section-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.6rem; }
+        .uhui-section-fields label { font-size: 0.8rem; color: var(--uhui-text-muted); }
+        .uhui-section-fields input, .uhui-section-fields select {
+            width: 100%; padding: 0.35rem 0.5rem; font-size: 0.85rem;
+            border: 1px solid var(--uhui-border); border-radius: 4px; background: var(--uhui-bg); color: var(--uhui-text);
+        }
+
+        /* ── Custom section query ── */
+        .uhui-query { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed var(--uhui-border); }
+        .uhui-query summary {
+            cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--uhui-accent); margin-bottom: 0.5rem;
+        }
+        .uhui-query-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 600px) { .uhui-query-grid { grid-template-columns: 1fr; } }
+
+        /* ── Tab list ── */
+        .uhui-tab-row {
+            display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 60px 50px 40px;
+            gap: 0.5rem; align-items: center; padding: 0.6rem 0.75rem;
+            background: var(--uhui-card); border: 1px solid var(--uhui-border); border-radius: var(--uhui-radius);
+            margin-bottom: 0.5rem;
+        }
+        .uhui-tab-row input, .uhui-tab-row select {
+            width: 100%; padding: 0.35rem; font-size: 0.85rem;
+            border: 1px solid var(--uhui-border); border-radius: 4px; background: var(--uhui-bg); color: var(--uhui-text);
+        }
+        .uhui-tab-header {
+            display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 60px 50px 40px;
+            gap: 0.5rem; padding: 0 0.75rem 0.4rem; font-size: 0.75rem; font-weight: 700;
+            color: var(--uhui-text-muted); text-transform: uppercase; letter-spacing: 0.04em;
+        }
+
+        /* ── Buttons ── */
+        .uhui-btn {
+            padding: 0.55rem 1.3rem; border: none; border-radius: var(--uhui-radius); cursor: pointer;
+            font-weight: 600; font-size: 0.9rem; transition: background 0.2s;
+        }
+        .uhui-btn--primary { background: var(--uhui-accent); color: #fff; }
+        .uhui-btn--primary:hover { background: var(--uhui-accent-hover); }
+        .uhui-btn--secondary { background: var(--uhui-border); color: var(--uhui-text); }
         .uhui-btn--secondary:hover { background: #444; }
+        .uhui-btn--sm { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+        .uhui-btn--danger { background: #742a2a; color: #feb2b2; }
+        .uhui-btn--danger:hover { background: #9b2c2c; }
+        .uhui-actions { display: flex; gap: 0.75rem; margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid var(--uhui-border); }
+
+        /* ── Toast ── */
         .uhui-toast {
-            position: fixed; bottom: 2rem; right: 2rem; background: #333; color: #fff;
-            padding: 0.75rem 1.5rem; border-radius: 6px; opacity: 0;
-            transition: opacity 0.3s; pointer-events: none; z-index: 1000;
+            position: fixed; bottom: 2rem; right: 2rem; padding: 0.8rem 1.5rem; border-radius: var(--uhui-radius);
+            font-weight: 600; font-size: 0.9rem; z-index: 9999; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s; transform: translateY(10px);
         }
-        .uhui-toast--visible { opacity: 1; }
+        .uhui-toast--visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .uhui-toast--ok { background: var(--uhui-success); color: #fff; }
+        .uhui-toast--err { background: var(--uhui-accent); color: #fff; }
+
+        /* ── Delete ── */
+        .uhui-btn-icon {
+            background: none; border: none; color: var(--uhui-text-muted); cursor: pointer; font-size: 1.1rem;
+            padding: 0.2rem; line-height: 1;
+        }
+        .uhui-btn-icon:hover { color: var(--uhui-accent); }
     </style>
 </head>
 <body>
-    <div id="ultimateHomeUIConfigPage" data-role="page" class="page type-interior pluginConfigurationPage"
+    <div id="ultimateHomeUIConfigPage" data-role="page"
+         class="page type-interior pluginConfigurationPage"
          data-require="emby-input,emby-button,emby-checkbox,emby-select">
         <div data-role="content">
-            <div class="content-primary uhui-config">
-                <h2>Ultimate Home UI — Configuración</h2>
+            <div class="content-primary uhui">
 
-                <h3>General</h3>
-
-                <div class="uhui-field">
-                    <label>
-                        <input type="checkbox" id="uhuiEnableCustomLayout" />
-                        Activar layout personalizado
-                    </label>
+                <div class="uhui-header">
+                    <div>
+                        <h2>Ultimate Home UI</h2>
+                        <small>Configuración completa del plugin</small>
+                    </div>
                 </div>
 
-                <div class="uhui-field">
-                    <label>
-                        <input type="checkbox" id="uhuiHideWatchedGlobally" />
-                        Ocultar contenido ya visto (global)
-                    </label>
+                <!-- Tab navigation -->
+                <div class="uhui-tabs">
+                    <button class="uhui-tab uhui-tab--active" data-panel="general">General</button>
+                    <button class="uhui-tab" data-panel="hero">Hero Slider</button>
+                    <button class="uhui-tab" data-panel="sections">Secciones</button>
+                    <button class="uhui-tab" data-panel="tabs">Pestañas</button>
                 </div>
 
-                <div class="uhui-field">
-                    <label for="uhuiMaxSections">Máximo de secciones visibles</label>
-                    <input type="number" id="uhuiMaxSections" min="1" max="30" />
+                <!-- ═══════════ GENERAL ═══════════ -->
+                <div id="panel-general" class="uhui-panel uhui-panel--active">
+                    <div class="uhui-group">
+                        <div class="uhui-group-title">Ajustes generales</div>
+
+                        <div class="uhui-field uhui-field--row">
+                            <label class="uhui-toggle">
+                                <input type="checkbox" id="cfgEnable">
+                                <span class="uhui-toggle-slider"></span>
+                            </label>
+                            <div>
+                                <label for="cfgEnable">Activar layout personalizado</label>
+                                <div class="uhui-hint">Reemplaza la pantalla de inicio de Jellyfin</div>
+                            </div>
+                        </div>
+
+                        <div class="uhui-field uhui-field--row">
+                            <label class="uhui-toggle">
+                                <input type="checkbox" id="cfgHideWatched">
+                                <span class="uhui-toggle-slider"></span>
+                            </label>
+                            <div>
+                                <label for="cfgHideWatched">Ocultar contenido ya visto</label>
+                                <div class="uhui-hint">Esconde globalmente los elementos reproducidos. Cada sección puede sobreescribir esto.</div>
+                            </div>
+                        </div>
+
+                        <div class="uhui-grid-2">
+                            <div class="uhui-field">
+                                <label for="cfgMaxSections">Máximo de secciones visibles</label>
+                                <input type="number" id="cfgMaxSections" min="1" max="30">
+                                <div class="uhui-hint">Límite de secciones que se muestran en la home</div>
+                            </div>
+                            <div class="uhui-field">
+                                <label for="cfgTieBreaking">Estrategia de empates</label>
+                                <select id="cfgTieBreaking">
+                                    <option value="0">Aleatorio en cada recarga</option>
+                                    <option value="1">Alfabético</option>
+                                    <option value="2">Última actividad</option>
+                                    <option value="3">Orden del servidor</option>
+                                </select>
+                                <div class="uhui-hint">Qué hacer cuando varias secciones comparten el mismo peso</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <h3>Hero Slider</h3>
+                <!-- ═══════════ HERO SLIDER ═══════════ -->
+                <div id="panel-hero" class="uhui-panel">
+                    <div class="uhui-group">
+                        <div class="uhui-group-title">Hero Media Slider</div>
 
-                <div class="uhui-field">
-                    <label>
-                        <input type="checkbox" id="uhuiHeroEnabled" />
-                        Activar Hero Slider
-                    </label>
+                        <div class="uhui-field uhui-field--row">
+                            <label class="uhui-toggle">
+                                <input type="checkbox" id="cfgHeroEnabled">
+                                <span class="uhui-toggle-slider"></span>
+                            </label>
+                            <div>
+                                <label for="cfgHeroEnabled">Activar Hero Slider</label>
+                                <div class="uhui-hint">Banner principal con contenido destacado</div>
+                            </div>
+                        </div>
+
+                        <div class="uhui-grid-2">
+                            <div class="uhui-field">
+                                <label for="cfgHeroSource">Fuente del contenido</label>
+                                <select id="cfgHeroSource">
+                                    <option value="0">Últimas añadidas</option>
+                                    <option value="1">Aleatorio</option>
+                                    <option value="2">Colección específica</option>
+                                    <option value="3">Género</option>
+                                    <option value="4">Tendencia</option>
+                                </select>
+                            </div>
+                            <div class="uhui-field">
+                                <label for="cfgHeroMaxItems">Elementos en rotación</label>
+                                <input type="number" id="cfgHeroMaxItems" min="1" max="20">
+                            </div>
+                        </div>
+
+                        <div class="uhui-field" id="heroCollectionField" style="display:none">
+                            <label for="cfgHeroCollectionId">ID de la colección</label>
+                            <input type="text" id="cfgHeroCollectionId" placeholder="ej. a1b2c3d4-...">
+                            <div class="uhui-hint">GUID de la colección (BoxSet) a usar como fuente</div>
+                        </div>
+                        <div class="uhui-field" id="heroGenreField" style="display:none">
+                            <label for="cfgHeroGenreName">Nombre del género</label>
+                            <input type="text" id="cfgHeroGenreName" placeholder="ej. Acción">
+                        </div>
+
+                        <div class="uhui-grid-2">
+                            <div class="uhui-field uhui-field--row">
+                                <label class="uhui-toggle">
+                                    <input type="checkbox" id="cfgHeroAutoPlay">
+                                    <span class="uhui-toggle-slider"></span>
+                                </label>
+                                <div>
+                                    <label for="cfgHeroAutoPlay">Autoplay de tráiler</label>
+                                    <div class="uhui-hint">Reproduce el tráiler de fondo en mute</div>
+                                </div>
+                            </div>
+                            <div class="uhui-field">
+                                <label for="cfgHeroInterval">Intervalo de rotación (seg)</label>
+                                <input type="number" id="cfgHeroInterval" min="3" max="30">
+                                <div class="uhui-hint">Segundos entre cada slide del Hero</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="uhui-field">
-                    <label for="uhuiHeroSource">Fuente del Hero</label>
-                    <select id="uhuiHeroSource">
-                        <option value="0">Últimas añadidas</option>
-                        <option value="1">Aleatorio</option>
-                        <option value="2">Colección</option>
-                        <option value="3">Género</option>
-                        <option value="4">Tendencia</option>
-                    </select>
+                <!-- ═══════════ SECTIONS ═══════════ -->
+                <div id="panel-sections" class="uhui-panel">
+                    <div class="uhui-group">
+                        <div class="uhui-group-title">Secciones de la pantalla de inicio</div>
+                        <div class="uhui-hint" style="margin-bottom:1rem">
+                            Configura cada sección: peso (menor = primero), tipo de tarjeta, límites y visibilidad.
+                            Las secciones con el mismo peso se barajan aleatoriamente en cada recarga.
+                        </div>
+                        <div id="sectionsContainer"></div>
+                        <button class="uhui-btn uhui-btn--secondary uhui-btn--sm" id="btnAddSection" style="margin-top:0.75rem">+ Añadir sección personalizada</button>
+                    </div>
                 </div>
 
-                <div class="uhui-field">
-                    <label for="uhuiHeroMaxItems">Elementos en el Hero</label>
-                    <input type="number" id="uhuiHeroMaxItems" min="1" max="20" />
+                <!-- ═══════════ TABS ═══════════ -->
+                <div id="panel-tabs" class="uhui-panel">
+                    <div class="uhui-group">
+                        <div class="uhui-group-title">Pestañas de navegación superior</div>
+                        <div class="uhui-hint" style="margin-bottom:1rem">
+                            Crea y reordena las pestañas que aparecen arriba de la home.
+                        </div>
+                        <div class="uhui-tab-header">
+                            <span>Nombre</span><span>Tipo</span><span>Destino</span><span>Orden</span><span>Visible</span><span></span>
+                        </div>
+                        <div id="tabsContainer"></div>
+                        <button class="uhui-btn uhui-btn--secondary uhui-btn--sm" id="btnAddTab" style="margin-top:0.75rem">+ Añadir pestaña</button>
+                    </div>
                 </div>
 
-                <h3>Estrategia de empates</h3>
-
-                <div class="uhui-field">
-                    <label for="uhuiTieBreaking">Cuando varias secciones comparten el mismo peso</label>
-                    <select id="uhuiTieBreaking">
-                        <option value="0">Aleatorio</option>
-                        <option value="1">Alfabético</option>
-                        <option value="2">Última actividad</option>
-                        <option value="3">Orden del servidor</option>
-                    </select>
+                <!-- ═══════════ ACTIONS ═══════════ -->
+                <div class="uhui-actions">
+                    <button class="uhui-btn uhui-btn--primary" id="btnSave">Guardar configuración</button>
+                    <button class="uhui-btn uhui-btn--secondary" id="btnReset">Restablecer todo</button>
                 </div>
 
-                <h3>Secciones preestablecidas</h3>
-                <p style="color: #aaa; font-size: 0.85rem;">
-                    Asigna un peso numérico a cada sección. Las secciones con el mismo peso se barajarán
-                    aleatoriamente en cada recarga. Menor peso = aparece primero.
-                </p>
-
-                <table class="uhui-sections-table">
-                    <thead>
-                        <tr>
-                            <th>Sección</th>
-                            <th>Peso</th>
-                            <th>Visible</th>
-                        </tr>
-                    </thead>
-                    <tbody id="uhuiSectionsBody"></tbody>
-                </table>
-
-                <div>
-                    <button class="uhui-btn uhui-btn--primary" id="uhuiSave">Guardar</button>
-                    <button class="uhui-btn uhui-btn--secondary" id="uhuiReset">Restablecer</button>
-                </div>
-
-                <div class="uhui-toast" id="uhuiToast"></div>
+                <div class="uhui-toast" id="toast"></div>
             </div>
         </div>
     </div>
 
     <script type="text/javascript">
-        const DEFAULT_SECTIONS = [
-            { sectionId: 'ContinueWatching', displayName: 'Continuar viendo', weight: 1, isVisible: true },
-            { sectionId: 'LatestAdded', displayName: 'Últimas añadidas', weight: 2, isVisible: true },
-            { sectionId: 'Favorites', displayName: 'Mis favoritos', weight: 3, isVisible: true },
-            { sectionId: 'BecauseYouWatched', displayName: 'Porque viste...', weight: 4, isVisible: true },
-            { sectionId: 'WatchAgain', displayName: 'Ver otra vez', weight: 5, isVisible: true },
-            { sectionId: 'HiddenGems', displayName: 'Joyas ocultas', weight: 6, isVisible: true },
-            { sectionId: 'TimeSlotSuggestions', displayName: 'Sugerencias por horario', weight: 7, isVisible: true },
+        var PLUGIN_ID = '0736fda4-7484-4372-8ce0-9d959232d19c';
+        var currentConfig = null;
+
+        var CARD_TYPES = [
+            { value: 0, label: 'Cuadrado (1:1)' },
+            { value: 1, label: 'Thumb (16:9)' },
+            { value: 2, label: 'Poster (2:3)' },
+            { value: 3, label: 'Landscape (16:9 grande)' }
         ];
 
-        document.querySelector('#ultimateHomeUIConfigPage')
-            .addEventListener('pageshow', function () {
-                loadConfig();
+        var HIDE_WATCHED_OPTS = [
+            { value: 0, label: 'Heredar global' },
+            { value: 1, label: 'Mostrar siempre' },
+            { value: 2, label: 'Ocultar siempre' }
+        ];
+
+        var TAB_TYPES = [
+            { value: 0, label: 'Inicio' },
+            { value: 1, label: 'Colección' },
+            { value: 2, label: 'Género' },
+            { value: 3, label: 'Playlist' },
+            { value: 4, label: 'Mi Lista' },
+            { value: 5, label: 'Biblioteca' }
+        ];
+
+        /* ── Tab switching ── */
+        document.querySelectorAll('.uhui-tab').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.uhui-tab').forEach(function (t) { t.classList.remove('uhui-tab--active'); });
+                document.querySelectorAll('.uhui-panel').forEach(function (p) { p.classList.remove('uhui-panel--active'); });
+                btn.classList.add('uhui-tab--active');
+                document.getElementById('panel-' + btn.dataset.panel).classList.add('uhui-panel--active');
             });
+        });
+
+        /* ── Hero source toggle ── */
+        document.getElementById('cfgHeroSource').addEventListener('change', function () {
+            toggleHeroFields(this.value);
+        });
+
+        function toggleHeroFields(val) {
+            document.getElementById('heroCollectionField').style.display = val === '2' ? '' : 'none';
+            document.getElementById('heroGenreField').style.display = val === '3' ? '' : 'none';
+        }
+
+        /* ── Page load ── */
+        document.querySelector('#ultimateHomeUIConfigPage').addEventListener('pageshow', function () {
+            loadConfig();
+        });
 
         function loadConfig() {
-            ApiClient.getPluginConfiguration(getPluginId()).then(function (config) {
-                document.getElementById('uhuiEnableCustomLayout').checked = config.EnableCustomLayout;
-                document.getElementById('uhuiHideWatchedGlobally').checked = config.HideWatchedGlobally;
-                document.getElementById('uhuiMaxSections').value = config.MaxSectionsVisible || 15;
-                document.getElementById('uhuiHeroEnabled').checked = config.HeroSliderEnabled;
-                document.getElementById('uhuiHeroSource').value = config.HeroSliderSource || 0;
-                document.getElementById('uhuiHeroMaxItems').value = config.HeroSliderMaxItems || 5;
-                document.getElementById('uhuiTieBreaking').value = config.DefaultTieBreakingStrategy || 0;
+            ApiClient.getPluginConfiguration(PLUGIN_ID).then(function (cfg) {
+                currentConfig = cfg;
 
-                renderSectionsTable(DEFAULT_SECTIONS);
+                document.getElementById('cfgEnable').checked = cfg.EnableCustomLayout;
+                document.getElementById('cfgHideWatched').checked = cfg.HideWatchedGlobally;
+                document.getElementById('cfgMaxSections').value = cfg.MaxSectionsVisible || 15;
+                document.getElementById('cfgTieBreaking').value = cfg.DefaultTieBreakingStrategy || 0;
+
+                document.getElementById('cfgHeroEnabled').checked = cfg.HeroSliderEnabled;
+                document.getElementById('cfgHeroSource').value = cfg.HeroSliderSource || 0;
+                document.getElementById('cfgHeroMaxItems').value = cfg.HeroSliderMaxItems || 5;
+                document.getElementById('cfgHeroAutoPlay').checked = cfg.HeroSliderAutoPlayTrailer !== false;
+                document.getElementById('cfgHeroInterval').value = cfg.HeroSliderIntervalSeconds || 8;
+                document.getElementById('cfgHeroCollectionId').value = cfg.HeroSliderCollectionId || '';
+                document.getElementById('cfgHeroGenreName').value = cfg.HeroSliderGenreName || '';
+                toggleHeroFields(String(cfg.HeroSliderSource || 0));
+
+                renderSections(cfg.Sections || []);
+                renderTabs(cfg.Tabs || []);
+            }).catch(function (err) {
+                showToast('Error al cargar la configuración: ' + err, true);
             });
         }
 
-        function renderSectionsTable(sections) {
-            var tbody = document.getElementById('uhuiSectionsBody');
-            tbody.innerHTML = '';
+        /* ── Render sections ── */
+        function renderSections(sections) {
+            var container = document.getElementById('sectionsContainer');
+            container.innerHTML = '';
 
-            sections.forEach(function (s) {
-                var tr = document.createElement('tr');
+            sections.forEach(function (s, idx) {
+                var card = document.createElement('div');
+                card.className = 'uhui-section-card' + (s.IsBuiltIn ? '' : ' uhui-section-card--custom');
+                card.dataset.idx = idx;
 
-                var tdName = document.createElement('td');
-                tdName.textContent = s.displayName || s.sectionId;
-                tr.appendChild(tdName);
+                var badge = s.IsBuiltIn
+                    ? '<span class="uhui-badge uhui-badge--builtin">Integrada</span>'
+                    : '<span class="uhui-badge uhui-badge--custom">Personalizada</span>';
 
-                var tdWeight = document.createElement('td');
-                var input = document.createElement('input');
-                input.type = 'number';
-                input.min = 0;
-                input.max = 100;
-                input.value = s.weight;
-                input.dataset.sectionId = s.sectionId;
-                input.className = 'uhui-section-weight';
-                tdWeight.appendChild(input);
-                tr.appendChild(tdWeight);
+                var deleteBtn = s.IsBuiltIn ? '' : '<button class="uhui-btn-icon btn-delete-section" title="Eliminar">&times;</button>';
 
-                var tdVisible = document.createElement('td');
-                var checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = s.isVisible !== false;
-                checkbox.dataset.sectionId = s.sectionId;
-                checkbox.className = 'uhui-section-visible';
-                tdVisible.appendChild(checkbox);
-                tr.appendChild(tdVisible);
+                var nameField = s.IsBuiltIn
+                    ? '<h4>' + escHtml(s.DisplayName || s.SectionId) + '</h4>'
+                    : '<h4><input type="text" class="sec-name" value="' + escAttr(s.DisplayName) + '" placeholder="Nombre de la sección" style="background:transparent;border:none;color:var(--uhui-text);font-size:0.95rem;font-weight:700;padding:0;width:100%"></h4>';
 
-                tbody.appendChild(tr);
+                card.innerHTML =
+                    '<div class="uhui-section-head">' +
+                        '<div style="display:flex;align-items:center;gap:0.5rem">' + nameField + badge + '</div>' +
+                        '<div style="display:flex;align-items:center;gap:0.5rem">' +
+                            deleteBtn +
+                            '<label class="uhui-toggle" title="Visible">' +
+                                '<input type="checkbox" class="sec-visible"' + (s.IsVisible !== false ? ' checked' : '') + '>' +
+                                '<span class="uhui-toggle-slider"></span>' +
+                            '</label>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="uhui-section-fields">' +
+                        '<div><label>Peso</label><input type="number" class="sec-weight" min="0" max="100" value="' + (s.Weight || 0) + '"></div>' +
+                        '<div><label>Tarjeta</label><select class="sec-card">' + optionsHtml(CARD_TYPES, s.CardType) + '</select></div>' +
+                        '<div><label>Mín. ítems</label><input type="number" class="sec-min" min="0" max="100" value="' + (s.MinItems || 0) + '"></div>' +
+                        '<div><label>Máx. ítems</label><input type="number" class="sec-max" min="1" max="100" value="' + (s.MaxItems || 25) + '"></div>' +
+                        '<div><label>Ocultar visto</label><select class="sec-hide">' + optionsHtml(HIDE_WATCHED_OPTS, s.HideWatchedOverride) + '</select></div>' +
+                    '</div>' +
+                    (s.IsBuiltIn ? '' : buildQueryHtml(s)) +
+                '';
+
+                container.appendChild(card);
             });
-        }
 
-        document.getElementById('uhuiSave').addEventListener('click', function () {
-            ApiClient.getPluginConfiguration(getPluginId()).then(function (config) {
-                config.EnableCustomLayout = document.getElementById('uhuiEnableCustomLayout').checked;
-                config.HideWatchedGlobally = document.getElementById('uhuiHideWatchedGlobally').checked;
-                config.MaxSectionsVisible = parseInt(document.getElementById('uhuiMaxSections').value, 10) || 15;
-                config.HeroSliderEnabled = document.getElementById('uhuiHeroEnabled').checked;
-                config.HeroSliderSource = parseInt(document.getElementById('uhuiHeroSource').value, 10);
-                config.HeroSliderMaxItems = parseInt(document.getElementById('uhuiHeroMaxItems').value, 10) || 5;
-                config.DefaultTieBreakingStrategy = parseInt(document.getElementById('uhuiTieBreaking').value, 10);
-
-                ApiClient.updatePluginConfiguration(getPluginId(), config).then(function () {
-                    showToast('Configuración guardada correctamente');
+            container.querySelectorAll('.btn-delete-section').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var idx = parseInt(this.closest('.uhui-section-card').dataset.idx);
+                    currentConfig.Sections.splice(idx, 1);
+                    renderSections(currentConfig.Sections);
                 });
+            });
+        }
+
+        function buildQueryHtml(s) {
+            return '<details class="uhui-query"><summary>Filtros de consulta</summary>' +
+                '<div class="uhui-query-grid">' +
+                    '<div><label>Tipo de medio</label><input type="text" class="sec-media" value="' + escAttr(s.MediaTypes || 'Movie') + '" placeholder="Movie, Series"></div>' +
+                    '<div><label>Géneros</label><input type="text" class="sec-genres" value="' + escAttr(s.Genres) + '" placeholder="Terror, Comedia"></div>' +
+                    '<div><label>Estudios</label><input type="text" class="sec-studios" value="' + escAttr(s.Studios) + '" placeholder="Marvel Studios"></div>' +
+                    '<div><label>Tags</label><input type="text" class="sec-tags" value="' + escAttr(s.Tags) + '"></div>' +
+                    '<div><label>Año mín.</label><input type="number" class="sec-minyear" value="' + (s.MinYear || '') + '" placeholder="2000"></div>' +
+                    '<div><label>Año máx.</label><input type="number" class="sec-maxyear" value="' + (s.MaxYear || '') + '" placeholder="2026"></div>' +
+                    '<div><label>Rating mín.</label><input type="number" class="sec-minrating" step="0.1" value="' + (s.MinRating || '') + '" placeholder="7.0"></div>' +
+                    '<div><label>Ordenar por</label><select class="sec-sortby">' +
+                        '<option value="DateCreated"' + (s.SortBy === 'DateCreated' ? ' selected' : '') + '>Fecha añadido</option>' +
+                        '<option value="SortName"' + (s.SortBy === 'SortName' ? ' selected' : '') + '>Nombre</option>' +
+                        '<option value="CommunityRating"' + (s.SortBy === 'CommunityRating' ? ' selected' : '') + '>Rating</option>' +
+                        '<option value="Random"' + (s.SortBy === 'Random' ? ' selected' : '') + '>Aleatorio</option>' +
+                        '<option value="ProductionYear"' + (s.SortBy === 'ProductionYear' ? ' selected' : '') + '>Año</option>' +
+                        '<option value="PlayCount"' + (s.SortBy === 'PlayCount' ? ' selected' : '') + '>Reproducciones</option>' +
+                    '</select></div>' +
+                    '<div><label>Dirección</label><select class="sec-sortdir">' +
+                        '<option value="0"' + (s.SortDirection === 0 ? ' selected' : '') + '>Ascendente</option>' +
+                        '<option value="1"' + (s.SortDirection !== 0 ? ' selected' : '') + '>Descendente</option>' +
+                    '</select></div>' +
+                '</div></details>';
+        }
+
+        /* ── Render tabs ── */
+        function renderTabs(tabs) {
+            var container = document.getElementById('tabsContainer');
+            container.innerHTML = '';
+
+            tabs.forEach(function (t, idx) {
+                var row = document.createElement('div');
+                row.className = 'uhui-tab-row';
+                row.dataset.idx = idx;
+
+                row.innerHTML =
+                    '<input type="text" class="tab-label" value="' + escAttr(t.Label) + '" placeholder="Nombre">' +
+                    '<select class="tab-type">' + optionsHtml(TAB_TYPES, t.LinkType) + '</select>' +
+                    '<input type="text" class="tab-target" value="' + escAttr(t.TargetId || t.GenreName || '') + '" placeholder="ID o nombre">' +
+                    '<input type="number" class="tab-order" min="0" max="100" value="' + (t.Order || 0) + '">' +
+                    '<label class="uhui-toggle" style="margin:0 auto"><input type="checkbox" class="tab-visible"' + (t.IsVisible !== false ? ' checked' : '') + '><span class="uhui-toggle-slider"></span></label>' +
+                    '<button class="uhui-btn-icon btn-delete-tab" title="Eliminar">&times;</button>';
+
+                container.appendChild(row);
+            });
+
+            container.querySelectorAll('.btn-delete-tab').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var idx = parseInt(this.closest('.uhui-tab-row').dataset.idx);
+                    currentConfig.Tabs.splice(idx, 1);
+                    renderTabs(currentConfig.Tabs);
+                });
+            });
+        }
+
+        /* ── Add section ── */
+        document.getElementById('btnAddSection').addEventListener('click', function () {
+            var id = 'custom_' + Date.now();
+            var sections = currentConfig.Sections || [];
+            var maxWeight = sections.reduce(function (m, s) { return Math.max(m, s.Weight || 0); }, 0);
+
+            sections.push({
+                SectionId: id,
+                DisplayName: 'Nueva sección',
+                Weight: maxWeight + 1,
+                IsVisible: true,
+                CardType: 2,
+                MinItems: 0,
+                MaxItems: 25,
+                HideWatchedOverride: 0,
+                IsBuiltIn: false,
+                MediaTypes: 'Movie',
+                Genres: '',
+                Studios: '',
+                Tags: '',
+                MinYear: 0,
+                MaxYear: 0,
+                MinRating: 0,
+                SortBy: 'DateCreated',
+                SortDirection: 1
+            });
+
+            currentConfig.Sections = sections;
+            renderSections(sections);
+        });
+
+        /* ── Add tab ── */
+        document.getElementById('btnAddTab').addEventListener('click', function () {
+            var tabs = currentConfig.Tabs || [];
+            var maxOrder = tabs.reduce(function (m, t) { return Math.max(m, t.Order || 0); }, 0);
+
+            tabs.push({
+                TabId: 'tab_' + Date.now(),
+                Label: 'Nueva pestaña',
+                LinkType: 0,
+                TargetId: '',
+                GenreName: '',
+                Order: maxOrder + 1,
+                IsVisible: true
+            });
+
+            currentConfig.Tabs = tabs;
+            renderTabs(tabs);
+        });
+
+        /* ── SAVE ── */
+        document.getElementById('btnSave').addEventListener('click', function () {
+            var cfg = currentConfig;
+
+            cfg.EnableCustomLayout = document.getElementById('cfgEnable').checked;
+            cfg.HideWatchedGlobally = document.getElementById('cfgHideWatched').checked;
+            cfg.MaxSectionsVisible = parseInt(document.getElementById('cfgMaxSections').value) || 15;
+            cfg.DefaultTieBreakingStrategy = parseInt(document.getElementById('cfgTieBreaking').value) || 0;
+
+            cfg.HeroSliderEnabled = document.getElementById('cfgHeroEnabled').checked;
+            cfg.HeroSliderSource = parseInt(document.getElementById('cfgHeroSource').value) || 0;
+            cfg.HeroSliderMaxItems = parseInt(document.getElementById('cfgHeroMaxItems').value) || 5;
+            cfg.HeroSliderAutoPlayTrailer = document.getElementById('cfgHeroAutoPlay').checked;
+            cfg.HeroSliderIntervalSeconds = parseInt(document.getElementById('cfgHeroInterval').value) || 8;
+            cfg.HeroSliderCollectionId = document.getElementById('cfgHeroCollectionId').value.trim();
+            cfg.HeroSliderGenreName = document.getElementById('cfgHeroGenreName').value.trim();
+
+            cfg.Sections = readSectionsFromDom();
+            cfg.Tabs = readTabsFromDom();
+
+            ApiClient.updatePluginConfiguration(PLUGIN_ID, cfg).then(function () {
+                showToast('Configuración guardada');
+            }).catch(function (err) {
+                showToast('Error al guardar: ' + err, true);
             });
         });
 
-        document.getElementById('uhuiReset').addEventListener('click', function () {
-            if (confirm('¿Restablecer toda la configuración a los valores por defecto?')) {
-                ApiClient.getPluginConfiguration(getPluginId()).then(function (config) {
-                    config.EnableCustomLayout = true;
-                    config.HideWatchedGlobally = false;
-                    config.MaxSectionsVisible = 15;
-                    config.HeroSliderEnabled = true;
-                    config.HeroSliderSource = 0;
-                    config.HeroSliderMaxItems = 5;
-                    config.DefaultTieBreakingStrategy = 0;
+        function readSectionsFromDom() {
+            var cards = document.querySelectorAll('.uhui-section-card');
+            var sections = [];
 
-                    ApiClient.updatePluginConfiguration(getPluginId(), config).then(function () {
-                        loadConfig();
-                        showToast('Configuración restablecida');
-                    });
-                });
-            }
-        });
+            cards.forEach(function (card, idx) {
+                var orig = currentConfig.Sections[idx] || {};
+                var nameInput = card.querySelector('.sec-name');
 
-        function getPluginId() {
-            return '0736fda4-7484-4372-8ce0-9d959232d19c';
+                var s = {
+                    SectionId: orig.SectionId || ('custom_' + idx),
+                    DisplayName: nameInput ? nameInput.value.trim() : (orig.DisplayName || orig.SectionId),
+                    Weight: parseInt(card.querySelector('.sec-weight').value) || 0,
+                    IsVisible: card.querySelector('.sec-visible').checked,
+                    CardType: parseInt(card.querySelector('.sec-card').value),
+                    MinItems: parseInt(card.querySelector('.sec-min').value) || 0,
+                    MaxItems: parseInt(card.querySelector('.sec-max').value) || 25,
+                    HideWatchedOverride: parseInt(card.querySelector('.sec-hide').value) || 0,
+                    IsBuiltIn: orig.IsBuiltIn !== false,
+                    MediaTypes: orig.MediaTypes || 'Movie',
+                    Genres: orig.Genres || '',
+                    Studios: orig.Studios || '',
+                    Tags: orig.Tags || '',
+                    MinYear: orig.MinYear || 0,
+                    MaxYear: orig.MaxYear || 0,
+                    MinRating: orig.MinRating || 0,
+                    SortBy: orig.SortBy || 'DateCreated',
+                    SortDirection: orig.SortDirection != null ? orig.SortDirection : 1
+                };
+
+                if (!s.IsBuiltIn) {
+                    var media = card.querySelector('.sec-media');
+                    if (media) s.MediaTypes = media.value.trim();
+                    var genres = card.querySelector('.sec-genres');
+                    if (genres) s.Genres = genres.value.trim();
+                    var studios = card.querySelector('.sec-studios');
+                    if (studios) s.Studios = studios.value.trim();
+                    var tags = card.querySelector('.sec-tags');
+                    if (tags) s.Tags = tags.value.trim();
+                    var minyear = card.querySelector('.sec-minyear');
+                    if (minyear) s.MinYear = parseInt(minyear.value) || 0;
+                    var maxyear = card.querySelector('.sec-maxyear');
+                    if (maxyear) s.MaxYear = parseInt(maxyear.value) || 0;
+                    var minrating = card.querySelector('.sec-minrating');
+                    if (minrating) s.MinRating = parseFloat(minrating.value) || 0;
+                    var sortby = card.querySelector('.sec-sortby');
+                    if (sortby) s.SortBy = sortby.value;
+                    var sortdir = card.querySelector('.sec-sortdir');
+                    if (sortdir) s.SortDirection = parseInt(sortdir.value);
+                }
+
+                sections.push(s);
+            });
+
+            return sections;
         }
 
-        function showToast(msg) {
-            var toast = document.getElementById('uhuiToast');
-            toast.textContent = msg;
-            toast.classList.add('uhui-toast--visible');
-            setTimeout(function () {
-                toast.classList.remove('uhui-toast--visible');
-            }, 3000);
+        function readTabsFromDom() {
+            var rows = document.querySelectorAll('.uhui-tab-row');
+            var tabs = [];
+
+            rows.forEach(function (row, idx) {
+                var orig = currentConfig.Tabs[idx] || {};
+                var linkType = parseInt(row.querySelector('.tab-type').value);
+                var target = row.querySelector('.tab-target').value.trim();
+
+                tabs.push({
+                    TabId: orig.TabId || ('tab_' + idx),
+                    Label: row.querySelector('.tab-label').value.trim() || 'Sin nombre',
+                    LinkType: linkType,
+                    TargetId: linkType !== 2 ? target : '',
+                    GenreName: linkType === 2 ? target : '',
+                    Order: parseInt(row.querySelector('.tab-order').value) || 0,
+                    IsVisible: row.querySelector('.tab-visible').checked
+                });
+            });
+
+            return tabs;
+        }
+
+        /* ── RESET ── */
+        document.getElementById('btnReset').addEventListener('click', function () {
+            if (!confirm('¿Restablecer toda la configuración a los valores por defecto? Se perderán las secciones personalizadas y pestañas.')) return;
+
+            var defaultCfg = {
+                EnableCustomLayout: true,
+                HideWatchedGlobally: false,
+                MaxSectionsVisible: 15,
+                DefaultTieBreakingStrategy: 0,
+                HeroSliderEnabled: true,
+                HeroSliderSource: 0,
+                HeroSliderMaxItems: 5,
+                HeroSliderAutoPlayTrailer: true,
+                HeroSliderIntervalSeconds: 8,
+                HeroSliderCollectionId: '',
+                HeroSliderGenreName: '',
+                Sections: [
+                    { SectionId: 'ContinueWatching', DisplayName: 'Continuar viendo', Weight: 1, IsVisible: true, CardType: 3, MinItems: 0, MaxItems: 25, HideWatchedOverride: 0, IsBuiltIn: true, MediaTypes: 'Movie', Genres: '', Studios: '', Tags: '', MinYear: 0, MaxYear: 0, MinRating: 0, SortBy: 'DateCreated', SortDirection: 1 },
+                    { SectionId: 'LatestAdded', DisplayName: 'Últimas añadidas', Weight: 2, IsVisible: true, CardType: 2, MinItems: 0, MaxItems: 25, HideWatchedOverride: 0, IsBuiltIn: true, MediaTypes: 'Movie', Genres: '', Studios: '', Tags: '', MinYear: 0, MaxYear: 0, MinRating: 0, SortBy: 'DateCreated', SortDirection: 1 },
+                    { SectionId: 'Favorites', DisplayName: 'Mis favoritos', Weight: 3, IsVisible: true, CardType: 2, MinItems: 0, MaxItems: 25, HideWatchedOverride: 0, IsBuiltIn: true, MediaTypes: 'Movie', Genres: '', Studios: '', Tags: '', MinYear: 0, MaxYear: 0, MinRating: 0, SortBy: 'DateCreated', SortDirection: 1 },
+                    { SectionId: 'BecauseYouWatched', DisplayName: 'Porque viste...', Weight: 4, IsVisible: true, CardType: 2, MinItems: 0, MaxItems: 25, HideWatchedOverride: 0, IsBuiltIn: true, MediaTypes: 'Movie', Genres: '', Studios: '', Tags: '', MinYear: 0, MaxYear: 0, MinRating: 0, SortBy: 'DateCreated', SortDirection: 1 },
+                    { SectionId: 'WatchAgain', DisplayName: 'Ver otra vez', Weight: 5, IsVisible: true, CardType: 2, MinItems: 0, MaxItems: 25, HideWatchedOverride: 0, IsBuiltIn: true, MediaTypes: 'Movie', Genres: '', Studios: '', Tags: '', MinYear: 0, MaxYear: 0, MinRating: 0, SortBy: 'DateCreated', SortDirection: 1 },
+                    { SectionId: 'HiddenGems', DisplayName: 'Joyas ocultas', Weight: 6, IsVisible: true, CardType: 2, MinItems: 0, MaxItems: 25, HideWatchedOverride: 0, IsBuiltIn: true, MediaTypes: 'Movie', Genres: '', Studios: '', Tags: '', MinYear: 0, MaxYear: 0, MinRating: 0, SortBy: 'DateCreated', SortDirection: 1 },
+                    { SectionId: 'TimeSlotSuggestions', DisplayName: 'Sugerencias por horario', Weight: 7, IsVisible: true, CardType: 1, MinItems: 0, MaxItems: 25, HideWatchedOverride: 0, IsBuiltIn: true, MediaTypes: 'Movie', Genres: '', Studios: '', Tags: '', MinYear: 0, MaxYear: 0, MinRating: 0, SortBy: 'DateCreated', SortDirection: 1 }
+                ],
+                Tabs: [
+                    { TabId: 'home', Label: 'Inicio', LinkType: 0, TargetId: '', GenreName: '', Order: 0, IsVisible: true },
+                    { TabId: 'favorites', Label: 'Mis favoritos', LinkType: 4, TargetId: '', GenreName: '', Order: 1, IsVisible: true }
+                ]
+            };
+
+            ApiClient.updatePluginConfiguration(PLUGIN_ID, defaultCfg).then(function () {
+                loadConfig();
+                showToast('Configuración restablecida');
+            }).catch(function (err) {
+                showToast('Error al restablecer: ' + err, true);
+            });
+        });
+
+        /* ── Helpers ── */
+        function optionsHtml(opts, selected) {
+            return opts.map(function (o) {
+                return '<option value="' + o.value + '"' + (o.value == selected ? ' selected' : '') + '>' + escHtml(o.label) + '</option>';
+            }).join('');
+        }
+
+        function escHtml(s) {
+            var d = document.createElement('div');
+            d.textContent = s || '';
+            return d.innerHTML;
+        }
+
+        function escAttr(s) {
+            return (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function showToast(msg, isError) {
+            var t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'uhui-toast uhui-toast--visible ' + (isError ? 'uhui-toast--err' : 'uhui-toast--ok');
+            setTimeout(function () { t.className = 'uhui-toast'; }, 3500);
         }
     </script>
 </body>

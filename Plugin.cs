@@ -40,15 +40,26 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     /// <inheritdoc />
     public IEnumerable<PluginPageInfo> GetPages()
     {
+        var resourcePath = string.Format(
+            CultureInfo.InvariantCulture,
+            "{0}.Configuration.configPage.html",
+            GetType().Namespace);
+
         return
         [
             new PluginPageInfo
             {
                 Name = Name,
-                EmbeddedResourcePath = string.Format(
-                    CultureInfo.InvariantCulture,
-                    "{0}.Configuration.configPage.html",
-                    GetType().Namespace),
+                EmbeddedResourcePath = resourcePath,
+            },
+            new PluginPageInfo
+            {
+                Name = "Ultimate Home UI Config",
+                EmbeddedResourcePath = resourcePath,
+                EnableInMainMenu = true,
+                MenuSection = "server",
+                MenuIcon = "dashboard",
+                DisplayName = "Ultimate Home UI",
             }
         ];
     }
