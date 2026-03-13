@@ -9,11 +9,11 @@
     "versions": [
       {
         "version": "1.5.4.0",
-        "changelog": "Inyección por middleware (index.html en memoria). Ya no requiere File Transformation ni escritura en disco.",
+        "changelog": "Release v1.5.4",
         "targetAbi": "10.11.0.0",
         "sourceUrl": "https://github.com/CuevasTech/jellyfin-ultimate-home-ui/releases/download/v1.5.4/Jellyfin.Plugin.UltimateHomeUI.zip",
-        "checksum": "",
-        "timestamp": "2026-03-13T12:00:00Z"
+        "checksum": "d32d5ba9e8b500f739bcff6fbc3ec4d0",
+        "timestamp": "2026-03-13T09:48:18Z"
       },
       {
         "version": "1.5.3.0",
