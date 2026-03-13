@@ -73,6 +73,21 @@ export function buildRow(section) {
   return row;
 }
 
+function toClientImageUrl(path) {
+  if (!path) return '';
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  const clean = path.replace(/^\/+/, '');
+  if (typeof ApiClient !== 'undefined' && typeof ApiClient.getUrl === 'function') {
+    return ApiClient.getUrl(clean);
+  }
+
+  return '/' + clean;
+}
+
 function buildCard(item, cardType) {
   const card = document.createElement('div');
   card.className = `uhui-card uhui-card--${cardType}`;
@@ -87,11 +102,16 @@ function buildCard(item, cardType) {
 
   if (imgUrl) {
     const img = document.createElement('img');
-    img.src = imgUrl;
+    img.src = toClientImageUrl(imgUrl);
     img.alt = item.title || '';
     img.loading = 'lazy';
     img.decoding = 'async';
     card.appendChild(img);
+  } else {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'uhui-card__placeholder';
+    placeholder.textContent = item.title || '';
+    card.appendChild(placeholder);
   }
 
   const overlay = document.createElement('div');

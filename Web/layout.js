@@ -5,7 +5,6 @@
 
 import { buildHero, destroyHero } from './hero.js';
 import { buildRow } from './sections.js';
-import { buildTabs } from './tabs.js';
 import { initTVNav, destroyTVNav } from './tv-nav.js';
 
 let homeRoot = null;
@@ -118,6 +117,11 @@ async function fetchHomeData(userId) {
 // ── Inyección del layout ──────────────────────────────────────────────────────
 
 export async function injectLayout(homeEl) {
+  const existing = document.getElementById('uhui-home-root');
+  if (existing) {
+    existing.remove();
+  }
+
   // Esperar a tener userId (autenticación puede no estar completa al instante)
   const userId = await waitForUserId();
 
@@ -142,10 +146,6 @@ export async function injectLayout(homeEl) {
 
   homeRoot = container;
 
-  const tabsEl = document.createElement('nav');
-  tabsEl.className = 'uhui-tabs';
-  container.appendChild(tabsEl);
-
   const heroEl = document.createElement('section');
   heroEl.className = 'uhui-hero';
   container.appendChild(heroEl);
@@ -157,7 +157,6 @@ export async function injectLayout(homeEl) {
   try {
     const data = await fetchHomeData(userId);
 
-    buildTabs(tabsEl, data.Tabs || data.tabs || []);
     buildHero(heroEl, data.HeroItems || data.heroItems || [], userId);
 
     const sections = data.Sections || data.sections || [];

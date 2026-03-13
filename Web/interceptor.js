@@ -15,6 +15,7 @@ import { injectLayout, destroyLayout } from './layout.js';
 let attached = false;
 let injected = false;
 let pollTimer = null;
+let currentObserver = null;
 
 // ── Detección de la página de inicio ──────────────────────────────────────────
 
@@ -36,7 +37,11 @@ function isHomePage() {
 // ── Gestión de la inyección ────────────────────────────────────────────────────
 
 function handleHomeFound(homeEl) {
-  if (injected) return;
+  if (injected || document.getElementById('uhui-home-root')) {
+    injected = true;
+    stopPolling();
+    return;
+  }
   injected = true;
   stopPolling();
 
@@ -69,6 +74,7 @@ function checkMutation(mutations, obs) {
 
       if (home) {
         obs.disconnect();
+        currentObserver = null;
         attached = false;
         handleHomeFound(home);
         return;
@@ -78,10 +84,18 @@ function checkMutation(mutations, obs) {
 }
 
 function attachObserver() {
-  if (attached) return;
+  if (attached || currentObserver) return;
   attached = true;
-  const obs = new MutationObserver(checkMutation);
-  obs.observe(document.body, { childList: true, subtree: true });
+  currentObserver = new MutationObserver(checkMutation);
+  currentObserver.observe(document.body, { childList: true, subtree: true });
+}
+
+function detachObserver() {
+  if (currentObserver) {
+    currentObserver.disconnect();
+    currentObserver = null;
+  }
+  attached = false;
 }
 
 // ── Polling fallback ──────────────────────────────────────────────────────────
@@ -124,9 +138,15 @@ export function init() {
   // 'pageshow' es el equivalente en versiones más antiguas.
   const onViewShow = () => {
     if (isHomePage()) {
+      if (document.getElementById('uhui-home-root')) {
+        injected = true;
+        stopPolling();
+        return;
+      }
       injected = false;
       attachObserver();
       tryInjectIfHome();
+      startPolling();
     }
   };
 
@@ -134,6 +154,7 @@ export function init() {
     if (injected) {
       injected = false;
       stopPolling();
+      detachObserver();
       destroyLayout();
     }
   };
@@ -147,6 +168,11 @@ export function init() {
   // Cambios de hash (navegación SPA sin eventos de Jellyfin)
   window.addEventListener('hashchange', () => {
     if (isHomePage()) {
+      if (document.getElementById('uhui-home-root')) {
+        injected = true;
+        stopPolling();
+        return;
+      }
       injected = false;
       attachObserver();
       tryInjectIfHome();
@@ -154,6 +180,7 @@ export function init() {
     } else if (injected) {
       injected = false;
       stopPolling();
+      detachObserver();
       destroyLayout();
     }
   });

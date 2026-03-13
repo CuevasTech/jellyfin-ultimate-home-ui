@@ -4,8 +4,8 @@
    ============================================================ */
 
 :root {
-  --uhui-bg:          #141414;
-  --uhui-surface:     #1f1f1f;
+  --uhui-bg:          #0f1117;
+  --uhui-surface:     #1a1f2b;
   --uhui-accent:      #e50914;
   --uhui-accent-hover:#ff1722;
   --uhui-text:        #ffffff;
@@ -23,8 +23,8 @@
   --uhui-transition:  200ms ease;
   --uhui-transition-slow: 400ms ease;
 
-  --uhui-hero-height: 56vh;
-  --uhui-tabs-height: 48px;
+  --uhui-hero-height: 68vh;
+  --uhui-tabs-height: 0px;
   --uhui-z-hero:      1;
   --uhui-z-tabs:      10;
   --uhui-z-overlay:   20;
@@ -33,22 +33,24 @@
 /* === LAYOUT SHELL === */
 
 .uhui-home {
-  display: grid;
-  grid-template-rows: var(--uhui-tabs-height) var(--uhui-hero-height) 1fr;
+  display: block;
   min-height: 100dvh;
   background: var(--uhui-bg);
   color: var(--uhui-text);
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  overflow: hidden;
+  font-family: 'Archivo Narrow', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
 .uhui-rows-container {
-  overflow-y: auto;
+  overflow-y: visible;
   overflow-x: hidden;
   scroll-snap-type: y proximity;
   scrollbar-width: none;
   padding-bottom: 4rem;
+  position: relative;
+  top: -3vh;
+  z-index: 6;
 }
 
 .uhui-rows-container::-webkit-scrollbar {
@@ -57,16 +59,7 @@
 
 /* === TOP TABS === */
 
-.uhui-tabs {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0 var(--uhui-row-pad);
-  background: linear-gradient(to bottom, rgba(20, 20, 20, 0.9) 0%, transparent 100%);
-  z-index: var(--uhui-z-tabs);
-  position: relative;
-  height: var(--uhui-tabs-height);
-}
+.uhui-tabs { display: none; }
 
 .uhui-tabs__btn {
   background: none;
@@ -97,7 +90,7 @@
 
 .uhui-hero {
   position: relative;
-  grid-row: 2;
+  height: var(--uhui-hero-height);
   overflow: hidden;
   z-index: var(--uhui-z-hero);
 }
@@ -118,16 +111,16 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(to right, rgba(20, 20, 20, 0.85) 0%, transparent 50%),
-    linear-gradient(to bottom, transparent 40%, var(--uhui-bg) 100%);
+    linear-gradient(130deg, rgba(29, 29, 29, 0.75) 10%, rgba(29, 29, 29, 0.35) 35%, rgba(29, 29, 29, 0) 100%),
+    linear-gradient(to bottom, transparent 55%, var(--uhui-bg) 100%);
   pointer-events: none;
 }
 
 .uhui-hero__meta {
   position: absolute;
-  bottom: clamp(1.5rem, 5vh, 4rem);
+  bottom: clamp(2.2rem, 9vh, 6rem);
   left: var(--uhui-row-pad);
-  max-width: min(45%, 600px);
+  max-width: min(48%, 760px);
   z-index: 2;
 }
 
@@ -138,7 +131,7 @@
 }
 
 .uhui-hero__title {
-  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-size: clamp(2rem, 4vw, 3.2rem);
   font-weight: 700;
   line-height: 1.1;
   margin: 0 0 0.5rem;
@@ -203,6 +196,7 @@
 .uhui-hero__btn--play {
   background: var(--uhui-text);
   color: #000;
+  border-radius: 8px;
 }
 
 .uhui-hero__btn--play:hover {
@@ -210,13 +204,25 @@
 }
 
 .uhui-hero__btn--fav {
-  background: rgba(255, 255, 255, 0.25);
-  color: var(--uhui-text);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.16);
+  color: #ff4a57;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  justify-content: center;
+  font-size: 0;
+}
+
+.uhui-hero__btn--fav::before {
+  content: 'favorite';
+  font-family: "Material Icons";
+  font-size: 24px;
 }
 
 .uhui-hero__btn--fav:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .uhui-hero__btn--fav.is-fav {
@@ -377,6 +383,19 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.uhui-card__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #2a3144 0%, #151a23 100%);
+  color: #d0d7e8;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 /* Card type variants */

@@ -13,6 +13,17 @@ let isMuted = true;
 
 const SLIDE_INTERVAL = 8000;
 
+function toClientImageUrl(path) {
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path)) return path;
+  const clean = path.replace(/^\/+/, '');
+  if (typeof ApiClient !== 'undefined' && typeof ApiClient.getUrl === 'function') {
+    return ApiClient.getUrl(clean);
+  }
+
+  return '/' + clean;
+}
+
 export function buildHero(container, items, userId) {
   heroEl = container;
   heroItems = items;
@@ -43,7 +54,7 @@ function renderSlide(container, item) {
   } else if (item.backdropUrl) {
     const img = document.createElement('img');
     img.className = 'uhui-hero__backdrop';
-    img.src = item.backdropUrl;
+    img.src = toClientImageUrl(item.backdropUrl);
     img.alt = item.title || '';
     img.loading = 'eager';
     img.decoding = 'async';
@@ -68,7 +79,7 @@ function renderTrailer(container, item) {
   video.loop = true;
   video.muted = isMuted;
   video.playsInline = true;
-  video.poster = item.backdropUrl || '';
+  video.poster = item.backdropUrl ? toClientImageUrl(item.backdropUrl) : '';
   videoEl = video;
   container.prepend(video);
 
@@ -78,7 +89,7 @@ function renderTrailer(container, item) {
     if (item.backdropUrl) {
       const img = document.createElement('img');
       img.className = 'uhui-hero__backdrop';
-      img.src = item.backdropUrl;
+      img.src = toClientImageUrl(item.backdropUrl);
       img.alt = item.title || '';
       container.prepend(img);
     }
@@ -118,7 +129,7 @@ function renderMeta(container, item) {
   if (item.logoUrl) {
     const logo = document.createElement('img');
     logo.className = 'uhui-hero__logo';
-    logo.src = item.logoUrl;
+    logo.src = toClientImageUrl(item.logoUrl);
     logo.alt = item.title || '';
     logo.loading = 'eager';
     meta.appendChild(logo);
