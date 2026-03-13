@@ -12,8 +12,8 @@
         "changelog": "Release v1.5.8",
         "targetAbi": "10.11.0.0",
         "sourceUrl": "https://github.com/CuevasTech/jellyfin-ultimate-home-ui/releases/download/v1.5.8/Jellyfin.Plugin.UltimateHomeUI.zip",
-        "checksum": "d3eb78470be000decfe0c39f9adbab9a",
-        "timestamp": "2026-03-13T12:15:17Z"
+        "checksum": "b19132a0e242f85f6d0a03bc11e1fc25",
+        "timestamp": "2026-03-13T12:21:34Z"
       },
       {
         "version": "1.5.7.0",
