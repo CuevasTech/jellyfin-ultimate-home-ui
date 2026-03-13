@@ -468,7 +468,7 @@
             ApiClient.getJSON(ApiClient.getUrl('UltimateHomeUI/InjectionStatus')).then(function (res) {
                 var isActive = !!(res && res.isActive);
                 if (isActive) {
-                    var mode = res.fileTransformationInjectionActive ? 'File Transformation (runtime)' : 'index.html (disco)';
+                    var mode = res.middlewareInjectionActive ? 'Middleware (en memoria)' : (res.fileTransformationInjectionActive ? 'File Transformation (runtime)' : 'index.html (disco)');
                     statusEl.style.background = '#1a2a1a';
                     statusEl.style.color = '#4ade80';
                     statusEl.style.borderColor = '#166534';
@@ -477,7 +477,7 @@
                     statusEl.style.background = '#2a1a1a';
                     statusEl.style.color = '#f87171';
                     statusEl.style.borderColor = '#7f1d1d';
-                    statusEl.innerHTML = '<span>&#9888;</span> Inyección no activa. Instala "File Transformation" o revisa permisos de escritura en web/index.html';
+                    statusEl.innerHTML = '<span>&#9888;</span> Inyección no activa. Revisa permisos de lectura en web/index.html o reinicia Jellyfin.';
                 }
             }).catch(function () {
                 statusEl.style.background = '#2a1a1a';

@@ -1,6 +1,8 @@
+using Jellyfin.Plugin.UltimateHomeUI.Middleware;
 using Jellyfin.Plugin.UltimateHomeUI.Services;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Plugins;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Jellyfin.Plugin.UltimateHomeUI;
@@ -17,5 +19,6 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<ISortingService, SortingService>();
         serviceCollection.AddSingleton<ISectionQueryService, SectionQueryService>();
         serviceCollection.AddSingleton<IHeroService, HeroService>();
+        serviceCollection.AddSingleton<IStartupFilter, UhuiWebIndexStartupFilter>();
     }
 }

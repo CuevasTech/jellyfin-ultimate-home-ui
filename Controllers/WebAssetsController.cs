@@ -24,7 +24,8 @@ public class WebAssetsController : ControllerBase
         {
             indexInjectionActive = Plugin.IndexInjectionActive,
             fileTransformationInjectionActive = Plugin.FileTransformationInjectionActive,
-            isActive = Plugin.IndexInjectionActive || Plugin.FileTransformationInjectionActive,
+            middlewareInjectionActive = Plugin.MiddlewareInjectionActive,
+            isActive = Plugin.IndexInjectionActive || Plugin.FileTransformationInjectionActive || Plugin.MiddlewareInjectionActive,
         });
     }
 

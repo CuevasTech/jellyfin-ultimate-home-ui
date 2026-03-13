@@ -78,6 +78,9 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     /// <summary>Gets a value indicating whether runtime File Transformation injection is active.</summary>
     public static bool FileTransformationInjectionActive { get; private set; }
 
+    /// <summary>Gets a value indicating whether middleware injection (index.html en memoria) is active.</summary>
+    public static bool MiddlewareInjectionActive { get; set; }
+
     /// <inheritdoc />
     public IEnumerable<PluginPageInfo> GetPages()
     {
