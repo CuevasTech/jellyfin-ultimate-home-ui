@@ -12,7 +12,7 @@
         "changelog": "Hero tipo Media Bar (slideshowpure), tarjetas con imagen nativa, intervalo/autoplay desde configuración.",
         "targetAbi": "10.11.0.0",
         "sourceUrl": "https://github.com/CuevasTech/jellyfin-ultimate-home-ui/releases/download/v1.5.9/Jellyfin.Plugin.UltimateHomeUI.zip",
-        "checksum": "b07d66320be8fdce7db6cb66ca9db94d",
+        "checksum": "6ff079fe56d57fe14b5b8e4530448449",
         "timestamp": "2026-03-13T14:00:00Z"
       },
       {
