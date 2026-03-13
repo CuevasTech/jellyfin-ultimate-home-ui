@@ -39,6 +39,8 @@ https://raw.githubusercontent.com/CuevasTech/jellyfin-ultimate-home-ui/master/ma
 4. Ve a **Catálogo** y busca **"Ultimate Home UI"**.
 5. Haz clic en **Instalar** y **reinicia Jellyfin**.
 
+**Si la instalación desde el catálogo falla:** descarga el ZIP desde [Releases](https://github.com/CuevasTech/jellyfin-ultimate-home-ui/releases). Crea una carpeta `Jellyfin.Plugin.UltimateHomeUI_1.5.4.0` dentro de la carpeta de plugins de Jellyfin (ruta de datos del servidor → `plugins/`), copia dentro el `.dll` y el `meta.json` del ZIP y reinicia. Comprueba que el directorio de plugins tenga permisos de escritura.
+
 ---
 
 ## Configuración
