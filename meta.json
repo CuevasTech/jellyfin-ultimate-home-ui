@@ -7,15 +7,16 @@
   "category": "UI",
   "versions": [
     {
-      "version": "1.5.7.0",
-      "changelog": "Sections con estilo nativo/theme-friendly y Media Bar visual reforzado, manteniendo personalización de secciones.",
+      "version": "1.5.8.0",
+      "changelog": "Media Bar más fiel (blur/solape/full-width/logo grande) y secciones en estilo nativo de Jellyfin con configuración respetada.",
       "targetAbi": "10.11.0.0",
       "sourceUrl": "",
       "checksum": "",
-      "timestamp": "2026-03-13T11:51:17Z"
+      "timestamp": "2026-03-13T12:15:17Z"
     }
   ]
 }
+
 
 
 

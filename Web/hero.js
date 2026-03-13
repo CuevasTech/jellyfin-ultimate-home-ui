@@ -11,8 +11,8 @@ let heroEl = null;
 let videoEl = null;
 let trailerFrameEl = null;
 let isMuted = true;
-
-const SLIDE_INTERVAL = 8000;
+let slideIntervalMs = 8000;
+let allowTrailerAutoplay = true;
 
 function toClientImageUrl(path) {
   if (!path) return '';
@@ -44,10 +44,12 @@ function buildImageFallback(itemId, type, maxWidth = 1600) {
   return toClientImageUrl(`/Items/${itemId}/Images/${type}?maxWidth=${maxWidth}&quality=90`);
 }
 
-export function buildHero(container, items, userId) {
+export function buildHero(container, items, userId, options = {}) {
   heroEl = container;
   heroItems = items;
   currentIndex = 0;
+  slideIntervalMs = Math.max((options.intervalSeconds || 8) * 1000, 2000);
+  allowTrailerAutoplay = options.autoPlayTrailer !== false;
 
   if (!items || items.length === 0) {
     container.style.display = 'none';
@@ -62,7 +64,7 @@ export function buildHero(container, items, userId) {
       currentIndex = (currentIndex + 1) % heroItems.length;
       renderSlide(container, heroItems[currentIndex]);
       updateDots(container, currentIndex);
-    }, SLIDE_INTERVAL);
+    }, slideIntervalMs);
   }
 }
 
@@ -73,7 +75,7 @@ function renderSlide(container, item) {
   mediaLayer.className = 'uhui-hero__media backdrop-container';
   container.prepend(mediaLayer);
 
-  if (item.trailerUrl && isEmbeddableTrailer(item.trailerUrl)) {
+  if (allowTrailerAutoplay && item.trailerUrl && isEmbeddableTrailer(item.trailerUrl)) {
     renderTrailer(mediaLayer, item);
   } else if (backdropUrl) {
     const img = document.createElement('img');
@@ -296,7 +298,7 @@ function resetTimer() {
       currentIndex = (currentIndex + 1) % heroItems.length;
       renderSlide(heroEl, heroItems[currentIndex]);
       updateDots(heroEl, currentIndex);
-    }, SLIDE_INTERVAL);
+    }, slideIntervalMs);
   }
 }
 

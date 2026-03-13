@@ -201,7 +201,7 @@ export async function injectLayout(homeEl) {
   container.appendChild(heroEl);
 
   const rowsEl = document.createElement('div');
-  rowsEl.className = 'uhui-rows-container';
+  rowsEl.className = 'uhui-rows-container homeSectionsContainer sections';
   container.appendChild(rowsEl);
 
   try {
@@ -209,7 +209,12 @@ export async function injectLayout(homeEl) {
     const heroData = pick(data, 'heroItems', 'HeroItems') || [];
     const normalizedHero = heroData.map(normalizeHeroItem).filter(Boolean);
 
-    buildHero(heroEl, normalizedHero, userId);
+    const heroInterval = pick(data, 'heroSliderIntervalSeconds', 'HeroSliderIntervalSeconds');
+    const heroAutoTrailer = pick(data, 'heroSliderAutoPlayTrailer', 'HeroSliderAutoPlayTrailer');
+    buildHero(heroEl, normalizedHero, userId, {
+      intervalSeconds: typeof heroInterval === 'number' && heroInterval > 0 ? heroInterval : 8,
+      autoPlayTrailer: heroAutoTrailer !== false,
+    });
 
     const sections = pick(data, 'sections', 'Sections') || [];
     let visibleRows = 0;

@@ -19,7 +19,7 @@ const CARD_TYPE_MAP = {
 
 export function buildRow(section) {
   const row = document.createElement('section');
-  row.className = 'verticalSection uhui-native-section';
+  row.className = 'verticalSection';
   row.dataset.sectionId = section.sectionId;
 
   const header = document.createElement('div');
@@ -34,7 +34,7 @@ export function buildRow(section) {
   wrapper.className = 'emby-scroller emby-scroller-with-paging';
 
   const track = document.createElement('div');
-  track.className = 'itemsContainer scrollSlider focuscontainer-x';
+  track.className = 'itemsContainer scrollSlider';
 
   const cardType = CARD_TYPE_MAP[section.cardType] || 'portrait';
 
@@ -84,7 +84,7 @@ function buildImageFallback(itemId, type, maxWidth = 420) {
 
 function buildCard(item, cardType) {
   const card = document.createElement('div');
-  const cardClasses = ['card', 'uhui-native-card'];
+  const cardClasses = ['card'];
   if (cardType === 'landscape' || cardType === 'thumb') {
     cardClasses.push('backdropCard');
   } else if (cardType === 'square') {
@@ -119,46 +119,8 @@ function buildCard(item, cardType) {
   text.className = 'cardText cardTextCentered';
   text.textContent = item.title || '';
 
-  if (item.subtitle) {
-    const sub = document.createElement('div');
-    sub.className = 'cardText cardText-secondary';
-    sub.textContent = item.subtitle;
-    card.appendChild(sub);
-  }
-
   card.appendChild(cardBox);
   card.appendChild(text);
-
-  if (item.playbackProgress && item.playbackProgress > 0) {
-    const progress = document.createElement('div');
-    progress.className = 'uhui-card__progress';
-    const fill = document.createElement('div');
-    fill.className = 'uhui-card__progress-fill';
-    fill.style.width = `${Math.min(item.playbackProgress * 100, 100)}%`;
-    progress.appendChild(fill);
-    card.appendChild(progress);
-  }
-
-  if (item.isFavorite) {
-    const fav = document.createElement('span');
-    fav.className = 'uhui-card__fav uhui-card__fav--visible';
-    fav.textContent = 'favorite';
-    card.appendChild(fav);
-  }
-
-  if (item.isPlayed) {
-    const played = document.createElement('div');
-    played.className = 'uhui-card__played';
-    played.textContent = '✓';
-    card.appendChild(played);
-  }
-
-  if (item.unplayedCount && item.unplayedCount > 0) {
-    const badge = document.createElement('div');
-    badge.className = 'uhui-card__unplayed';
-    badge.textContent = item.unplayedCount.toString();
-    card.appendChild(badge);
-  }
 
   card.addEventListener('click', () => {
     if (itemId) {

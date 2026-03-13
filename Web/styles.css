@@ -49,7 +49,7 @@
   scrollbar-width: none;
   padding-bottom: 4rem;
   position: relative;
-  top: -3vh;
+  top: -5vh;
   z-index: 6;
   background: transparent;
 }
@@ -96,6 +96,27 @@
   z-index: var(--uhui-z-hero);
 }
 
+.uhui-hero::before,
+.uhui-hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 8vh;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.uhui-hero::before {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent);
+}
+
+.uhui-hero::after {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.68), transparent);
+}
+
 .uhui-hero__backdrop {
   position: absolute;
   inset: 0;
@@ -123,6 +144,8 @@
 
 .backdrop.with-video {
   width: 100%;
+  min-width: 100%;
+  min-height: 100%;
 }
 
 .backdrop-overlay {
@@ -151,9 +174,10 @@
 }
 
 .uhui-hero__logo {
-  max-width: 300px;
-  max-height: 120px;
+  max-width: min(42vw, 680px);
+  max-height: 220px;
   margin-bottom: 0.75rem;
+  filter: brightness(1.07);
 }
 
 .uhui-hero__title {
@@ -319,204 +343,7 @@
 
 /* === ROWS === */
 
-/* === Native-like sections/cards (theme-friendly) === */
-.uhui-native-section {
-  padding: 0.25rem var(--uhui-row-pad) 0.8rem;
-}
-
-.uhui-native-section .sectionTitleContainer {
-  margin-bottom: 0.45rem;
-}
-
-.uhui-native-section .sectionTitle {
-  margin: 0;
-  color: var(--primaryTextColor, #fff);
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-
-.uhui-native-section .itemsContainer {
-  display: flex;
-  gap: 0.65rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 6px;
-}
-
-.uhui-native-section .itemsContainer::-webkit-scrollbar {
-  display: none;
-}
-
-/* === CARDS === */
-
-.uhui-native-card {
-  flex: 0 0 auto;
-  width: clamp(150px, 13vw, 230px);
-  position: relative;
-  transition: transform 180ms ease, filter 180ms ease;
-}
-
-.uhui-native-card.backdropCard {
-  width: clamp(220px, 24vw, 430px);
-}
-
-.uhui-native-card.squareCard {
-  width: clamp(130px, 12vw, 210px);
-}
-
-.uhui-native-card:hover,
-.uhui-native-card:focus-visible {
-  transform: scale(1.03);
-  filter: brightness(1.06);
-  outline: none;
-  z-index: 4;
-}
-
-.uhui-native-card .cardBox {
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.uhui-native-card .cardImageContainer {
-  width: 100%;
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  aspect-ratio: 2/3;
-}
-
-.uhui-native-card.backdropCard .cardImageContainer {
-  aspect-ratio: 16/9;
-}
-
-.uhui-native-card.squareCard .cardImageContainer {
-  aspect-ratio: 1/1;
-}
-
-.uhui-native-card .cardText {
-  color: var(--primaryTextColor, #fff);
-  margin-top: 0.35rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.uhui-native-card .cardText-secondary {
-  color: var(--secondaryTextColor, #aaa);
-  font-size: 0.82rem;
-}
-
-.uhui-card:focus-visible {
-  box-shadow: var(--uhui-focus-ring);
-}
-
-.uhui-card__placeholder {
-  display: none;
-}
-
-/* Card type variants */
-.uhui-card--square   { --uhui-card-ratio: 1/1; }
-.uhui-card--thumb    { --uhui-card-ratio: 16/9; --uhui-card-w: clamp(180px, 22vw, 320px); }
-.uhui-card--portrait { --uhui-card-ratio: 2/3; }
-.uhui-card--landscape{ --uhui-card-ratio: 16/9; --uhui-card-w: clamp(220px, 28vw, 400px); }
-
-/* Card overlay */
-.uhui-card__overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 50%);
-  opacity: 0.04;
-  transition: opacity var(--uhui-transition);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 0.5rem;
-}
-
-.uhui-card:hover .uhui-card__overlay,
-.uhui-card:focus-visible .uhui-card__overlay {
-  opacity: 1;
-}
-
-.uhui-card__title {
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.uhui-card__subtitle {
-  font-size: 0.7rem;
-  color: var(--uhui-text-muted);
-}
-
-/* Progress bar */
-.uhui-card__progress {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.uhui-card__progress-fill {
-  height: 100%;
-  background: var(--uhui-accent);
-  transition: width 0.3s ease;
-}
-
-/* Favorite badge */
-.uhui-card__fav {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  font-size: 1rem;
-  color: #ff4a57;
-  opacity: 0;
-  transition: opacity var(--uhui-transition);
-  font-family: "Material Icons";
-  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.7);
-}
-
-.uhui-card:hover .uhui-card__fav,
-.uhui-card__fav--visible {
-  opacity: 1;
-}
-
-/* Played check */
-.uhui-card__played {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  width: 20px;
-  height: 20px;
-  background: var(--uhui-accent);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-}
-
-/* Unplayed count badge */
-.uhui-card__unplayed {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  background: var(--uhui-accent);
-  color: var(--uhui-text);
-  font-size: 0.65rem;
-  font-weight: 700;
-  min-width: 20px;
-  height: 20px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 5px;
-}
+/* Las secciones y tarjetas usan exclusivamente el estilo nativo de Jellyfin/theme. */
 
 /* === RESPONSIVE === */
 
@@ -539,11 +366,8 @@
     -webkit-line-clamp: 2;
   }
 
-  .uhui-card--thumb    { --uhui-card-w: clamp(150px, 40vw, 250px); }
-  .uhui-card--landscape{ --uhui-card-w: clamp(180px, 50vw, 300px); }
-
-  .uhui-row__btn {
-    display: none;
+  .uhui-rows-container {
+    top: -2vh;
   }
 }
 
@@ -568,8 +392,9 @@
     padding: 0.5rem 1rem;
   }
 
-  .uhui-card--thumb    { --uhui-card-w: 70vw; }
-  .uhui-card--landscape{ --uhui-card-w: 80vw; }
+  .uhui-rows-container {
+    top: 0;
+  }
 }
 
 /* Android TV / Large screen */

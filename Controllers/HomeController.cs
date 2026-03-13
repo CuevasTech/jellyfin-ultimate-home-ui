@@ -90,6 +90,8 @@ public class HomeController : ControllerBase
             HeroItems = heroItems,
             Sections = sortedSections,
             Tabs = prefs?.Tabs ?? new List<HomeTabDto>(),
+            HeroSliderIntervalSeconds = config?.HeroSliderIntervalSeconds ?? 8,
+            HeroSliderAutoPlayTrailer = config?.HeroSliderAutoPlayTrailer ?? true,
         });
     }
 }
@@ -107,4 +109,10 @@ public class HomePageDto
 
     /// <summary>Gets or sets the navigation tabs.</summary>
     public List<HomeTabDto> Tabs { get; set; } = [];
+
+    /// <summary>Gets or sets the hero rotation interval in seconds.</summary>
+    public int HeroSliderIntervalSeconds { get; set; } = 8;
+
+    /// <summary>Gets or sets a value indicating whether trailers autoplay in hero.</summary>
+    public bool HeroSliderAutoPlayTrailer { get; set; } = true;
 }
