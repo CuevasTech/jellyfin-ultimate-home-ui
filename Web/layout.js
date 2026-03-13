@@ -114,6 +114,56 @@ async function fetchHomeData(userId) {
   return response.json();
 }
 
+function pick(obj, ...keys) {
+  for (const key of keys) {
+    if (obj && obj[key] !== undefined && obj[key] !== null) {
+      return obj[key];
+    }
+  }
+
+  return null;
+}
+
+function normalizeMediaItem(item) {
+  if (!item) return null;
+
+  return {
+    itemId: pick(item, 'itemId', 'ItemId', 'id', 'Id'),
+    title: pick(item, 'title', 'Title', 'name', 'Name') || '',
+    subtitle: pick(item, 'subtitle', 'Subtitle'),
+    primaryImageUrl: pick(item, 'primaryImageUrl', 'PrimaryImageUrl'),
+    backdropImageUrl: pick(item, 'backdropImageUrl', 'BackdropImageUrl'),
+    mediaType: pick(item, 'mediaType', 'MediaType'),
+    year: pick(item, 'year', 'Year'),
+    communityRating: pick(item, 'communityRating', 'CommunityRating'),
+    officialRating: pick(item, 'officialRating', 'OfficialRating'),
+    playbackProgress: pick(item, 'playbackProgress', 'PlaybackProgress'),
+    isPlayed: !!pick(item, 'isPlayed', 'IsPlayed'),
+    isFavorite: !!pick(item, 'isFavorite', 'IsFavorite'),
+    unplayedCount: pick(item, 'unplayedCount', 'UnplayedCount'),
+  };
+}
+
+function normalizeHeroItem(item) {
+  if (!item) return null;
+  return {
+    itemId: pick(item, 'itemId', 'ItemId', 'id', 'Id'),
+    title: pick(item, 'title', 'Title', 'name', 'Name') || '',
+    tagline: pick(item, 'tagline', 'Tagline'),
+    overview: pick(item, 'overview', 'Overview'),
+    year: pick(item, 'year', 'Year'),
+    officialRating: pick(item, 'officialRating', 'OfficialRating'),
+    communityRating: pick(item, 'communityRating', 'CommunityRating'),
+    runtimeMinutes: pick(item, 'runtimeMinutes', 'RuntimeMinutes'),
+    genres: pick(item, 'genres', 'Genres'),
+    backdropUrl: pick(item, 'backdropUrl', 'BackdropUrl'),
+    logoUrl: pick(item, 'logoUrl', 'LogoUrl'),
+    trailerUrl: pick(item, 'trailerUrl', 'TrailerUrl'),
+    mediaType: pick(item, 'mediaType', 'MediaType'),
+    isFavorite: !!pick(item, 'isFavorite', 'IsFavorite'),
+  };
+}
+
 // ── Inyección del layout ──────────────────────────────────────────────────────
 
 export async function injectLayout(homeEl) {
@@ -156,19 +206,22 @@ export async function injectLayout(homeEl) {
 
   try {
     const data = await fetchHomeData(userId);
+    const heroData = pick(data, 'heroItems', 'HeroItems') || [];
+    const normalizedHero = heroData.map(normalizeHeroItem).filter(Boolean);
 
-    buildHero(heroEl, data.HeroItems || data.heroItems || [], userId);
+    buildHero(heroEl, normalizedHero, userId);
 
-    const sections = data.Sections || data.sections || [];
+    const sections = pick(data, 'sections', 'Sections') || [];
     let visibleRows = 0;
 
     for (const section of sections) {
-      const items = section.Items || section.items || [];
+      const rawItems = pick(section, 'items', 'Items') || [];
+      const items = rawItems.map(normalizeMediaItem).filter(Boolean);
       if (items.length > 0) {
         const rowEl = buildRow({
-          sectionId: section.SectionId || section.sectionId,
-          title: section.Title || section.title,
-          cardType: section.CardType ?? section.cardType,
+          sectionId: pick(section, 'sectionId', 'SectionId'),
+          title: pick(section, 'title', 'Title'),
+          cardType: pick(section, 'cardType', 'CardType'),
           items,
         });
         rowsEl.appendChild(rowEl);

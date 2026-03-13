@@ -9,6 +9,7 @@ let currentIndex = 0;
 let heroItems = [];
 let heroEl = null;
 let videoEl = null;
+let trailerFrameEl = null;
 let isMuted = true;
 
 const SLIDE_INTERVAL = 8000;
@@ -22,6 +23,25 @@ function toClientImageUrl(path) {
   }
 
   return '/' + clean;
+}
+
+function extractYouTubeId(url) {
+  if (!url) return null;
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/]+)/i);
+  return match ? match[1] : null;
+}
+
+function buildImageFallback(itemId, type, maxWidth = 1600) {
+  if (!itemId) return '';
+  if (typeof ApiClient !== 'undefined' && typeof ApiClient.getImageUrl === 'function') {
+    try {
+      return ApiClient.getImageUrl(itemId, { type, maxWidth, quality: 90 });
+    } catch {
+      // ignore and fallback
+    }
+  }
+
+  return toClientImageUrl(`/Items/${itemId}/Images/${type}?maxWidth=${maxWidth}&quality=90`);
 }
 
 export function buildHero(container, items, userId) {
@@ -48,16 +68,20 @@ export function buildHero(container, items, userId) {
 
 function renderSlide(container, item) {
   clearMedia(container);
+  const backdropUrl = item.backdropUrl || buildImageFallback(item.itemId, 'Backdrop', 1920);
 
   if (item.trailerUrl && isEmbeddableTrailer(item.trailerUrl)) {
     renderTrailer(container, item);
-  } else if (item.backdropUrl) {
+  } else if (backdropUrl) {
     const img = document.createElement('img');
     img.className = 'uhui-hero__backdrop';
-    img.src = toClientImageUrl(item.backdropUrl);
+    img.src = toClientImageUrl(backdropUrl);
     img.alt = item.title || '';
     img.loading = 'eager';
     img.decoding = 'async';
+    img.onerror = () => {
+      img.src = buildImageFallback(item.itemId, 'Primary', 1280);
+    };
     container.prepend(img);
   }
 
@@ -72,6 +96,20 @@ function renderSlide(container, item) {
 }
 
 function renderTrailer(container, item) {
+  const youtubeId = extractYouTubeId(item.trailerUrl);
+  if (youtubeId) {
+    const iframe = document.createElement('iframe');
+    iframe.className = 'uhui-hero__backdrop uhui-hero__backdrop--video';
+    iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${youtubeId}&playsinline=1&modestbranding=1&rel=0`;
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    iframe.setAttribute('frameborder', '0');
+    iframe.setAttribute('allowfullscreen', '');
+    trailerFrameEl = iframe;
+    container.prepend(iframe);
+    return;
+  }
+
   const video = document.createElement('video');
   video.className = 'uhui-hero__backdrop uhui-hero__backdrop--video';
   video.src = item.trailerUrl;
@@ -79,17 +117,18 @@ function renderTrailer(container, item) {
   video.loop = true;
   video.muted = isMuted;
   video.playsInline = true;
-  video.poster = item.backdropUrl ? toClientImageUrl(item.backdropUrl) : '';
+  const backdropUrl = item.backdropUrl || buildImageFallback(item.itemId, 'Backdrop', 1920);
+  video.poster = backdropUrl ? toClientImageUrl(backdropUrl) : '';
   videoEl = video;
   container.prepend(video);
 
   video.play().catch(() => {
     video.remove();
     videoEl = null;
-    if (item.backdropUrl) {
+    if (backdropUrl) {
       const img = document.createElement('img');
       img.className = 'uhui-hero__backdrop';
-      img.src = toClientImageUrl(item.backdropUrl);
+      img.src = toClientImageUrl(backdropUrl);
       img.alt = item.title || '';
       container.prepend(img);
     }
@@ -100,7 +139,10 @@ function renderTrailer(container, item) {
 
 function isEmbeddableTrailer(url) {
   if (!url) return false;
-  return url.endsWith('.mp4') || url.endsWith('.webm') || url.includes('/Videos/');
+  return /(?:youtube\.com|youtu\.be)/i.test(url)
+    || url.endsWith('.mp4')
+    || url.endsWith('.webm')
+    || url.includes('/Videos/');
 }
 
 function buildSoundToggle(container) {
@@ -193,16 +235,18 @@ function renderMeta(container, item) {
   const playBtn = document.createElement('button');
   playBtn.className = 'uhui-hero__btn uhui-hero__btn--play';
   playBtn.setAttribute('data-focusable', '');
-  playBtn.textContent = '▶ Reproducir';
+  playBtn.textContent = 'Reproducir';
   playBtn.addEventListener('click', () => {
-    window.location.href = `#!/item?id=${item.itemId}&serverId=`;
+    if (item.itemId) {
+      window.location.href = `#!/details?id=${item.itemId}`;
+    }
   });
   actions.appendChild(playBtn);
 
   const favBtn = document.createElement('button');
   favBtn.className = `uhui-hero__btn uhui-hero__btn--fav${item.isFavorite ? ' is-fav' : ''}`;
   favBtn.setAttribute('data-focusable', '');
-  favBtn.textContent = item.isFavorite ? '♥ Favorito' : '♡ Favorito';
+  favBtn.setAttribute('aria-label', item.isFavorite ? 'Favorito' : 'Añadir a favoritos');
   actions.appendChild(favBtn);
 
   meta.appendChild(actions);
@@ -250,6 +294,11 @@ function resetTimer() {
 }
 
 function clearMedia(container) {
+  if (trailerFrameEl) {
+    trailerFrameEl.remove();
+    trailerFrameEl = null;
+  }
+
   const oldImg = container.querySelector('.uhui-hero__backdrop:not(.uhui-hero__backdrop--video)');
   if (oldImg) oldImg.remove();
   if (videoEl) {
@@ -269,6 +318,7 @@ export function destroyHero() {
     videoEl.remove();
     videoEl = null;
   }
+  trailerFrameEl = null;
   heroItems = [];
   currentIndex = 0;
   heroEl = null;

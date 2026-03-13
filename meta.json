@@ -7,13 +7,14 @@
   "category": "UI",
   "versions": [
     {
-      "version": "1.5.5.0",
-      "changelog": "Fix inyección duplicada (single mount), corrección de URLs con BaseUrl y estilo hero tipo Media Bar.",
+      "version": "1.5.6.0",
+      "changelog": "Fix DTO PascalCase/camelCase, fallback robusto de imágenes y hero más cercano a Media Bar con trailers YouTube/mp4.",
       "targetAbi": "10.11.0.0",
       "sourceUrl": "",
       "checksum": "",
-      "timestamp": "2026-03-13T10:55:18Z"
+      "timestamp": "2026-03-13T11:08:18Z"
     }
   ]
 }
+
 

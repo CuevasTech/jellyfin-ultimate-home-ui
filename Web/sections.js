@@ -88,24 +88,44 @@ function toClientImageUrl(path) {
   return '/' + clean;
 }
 
+function buildImageFallback(itemId, type, maxWidth = 420) {
+  if (!itemId) return '';
+  if (typeof ApiClient !== 'undefined' && typeof ApiClient.getImageUrl === 'function') {
+    try {
+      return ApiClient.getImageUrl(itemId, { type, maxWidth, quality: 90 });
+    } catch {
+      // ignore and fallback to static path
+    }
+  }
+
+  return toClientImageUrl(`/Items/${itemId}/Images/${type}?maxWidth=${maxWidth}&quality=90`);
+}
+
 function buildCard(item, cardType) {
   const card = document.createElement('div');
   card.className = `uhui-card uhui-card--${cardType}`;
   card.setAttribute('data-focusable', '');
   card.setAttribute('tabindex', '0');
-  card.dataset.itemId = item.itemId;
+  const itemId = item.itemId;
+  card.dataset.itemId = itemId || '';
 
   const useBackdrop = cardType === 'thumb' || cardType === 'landscape';
   const imgUrl = useBackdrop && item.backdropImageUrl
     ? item.backdropImageUrl
-    : item.primaryImageUrl;
+    : (item.primaryImageUrl || (useBackdrop ? '' : buildImageFallback(itemId, 'Primary')));
+  const resolvedUrl = imgUrl || (useBackdrop
+    ? buildImageFallback(itemId, 'Backdrop', 800)
+    : buildImageFallback(itemId, 'Primary', 420));
 
-  if (imgUrl) {
+  if (resolvedUrl) {
     const img = document.createElement('img');
-    img.src = toClientImageUrl(imgUrl);
+    img.src = toClientImageUrl(resolvedUrl);
     img.alt = item.title || '';
     img.loading = 'lazy';
     img.decoding = 'async';
+    img.onerror = () => {
+      img.src = buildImageFallback(itemId, useBackdrop ? 'Primary' : 'Backdrop', useBackdrop ? 800 : 420);
+    };
     card.appendChild(img);
   } else {
     const placeholder = document.createElement('div');
@@ -163,12 +183,16 @@ function buildCard(item, cardType) {
   }
 
   card.addEventListener('click', () => {
-    window.location.href = `#!/item?id=${item.itemId}&serverId=`;
+    if (itemId) {
+      window.location.href = `#!/details?id=${itemId}`;
+    }
   });
 
   card.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.keyCode === 13) {
-      window.location.href = `#!/item?id=${item.itemId}&serverId=`;
+      if (itemId) {
+        window.location.href = `#!/details?id=${itemId}`;
+      }
     }
   });
 

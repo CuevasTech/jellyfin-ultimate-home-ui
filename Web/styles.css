@@ -105,6 +105,8 @@
 
 .uhui-hero__backdrop--video {
   object-fit: cover;
+  border: 0;
+  pointer-events: none;
 }
 
 .uhui-hero__gradient {
@@ -174,6 +176,7 @@
 .uhui-hero__actions {
   display: flex;
   gap: 0.75rem;
+  align-items: center;
 }
 
 .uhui-hero__btn {
@@ -197,6 +200,17 @@
   background: var(--uhui-text);
   color: #000;
   border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 0.55rem 1.1rem;
+  font-family: 'Archivo Narrow', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.uhui-hero__btn--play::before {
+  content: 'play_arrow';
+  font-family: "Material Icons";
+  font-size: 22px;
+  line-height: 1;
 }
 
 .uhui-hero__btn--play:hover {
@@ -219,6 +233,7 @@
   content: 'favorite';
   font-family: "Material Icons";
   font-size: 24px;
+  line-height: 1;
 }
 
 .uhui-hero__btn--fav:hover {
@@ -293,9 +308,10 @@
 
 .uhui-row__title {
   font-size: clamp(1rem, 1.5vw, 1.35rem);
-  font-weight: 600;
+  font-weight: 700;
   margin: 0;
   color: var(--uhui-text);
+  letter-spacing: 0.01em;
 }
 
 .uhui-row__wrapper {
@@ -357,10 +373,10 @@
 .uhui-card {
   flex: 0 0 var(--uhui-card-w);
   aspect-ratio: var(--uhui-card-ratio);
-  border-radius: var(--uhui-radius);
+  border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform var(--uhui-transition), box-shadow var(--uhui-transition);
+  transition: transform var(--uhui-transition), box-shadow var(--uhui-transition), filter var(--uhui-transition);
   scroll-snap-align: start;
   position: relative;
   background: var(--uhui-surface);
@@ -368,8 +384,9 @@
 
 .uhui-card:hover,
 .uhui-card:focus-visible {
-  transform: scale(1.08);
+  transform: scale(1.04);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  filter: brightness(1.05);
   outline: none;
   z-index: 5;
 }
@@ -409,7 +426,7 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 50%);
-  opacity: 0;
+  opacity: 0.04;
   transition: opacity var(--uhui-transition);
   display: flex;
   flex-direction: column;
