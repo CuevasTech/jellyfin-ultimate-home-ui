@@ -209,10 +209,11 @@ export async function injectLayout(homeEl) {
     const heroData = pick(data, 'heroItems', 'HeroItems') || [];
     const normalizedHero = heroData.map(normalizeHeroItem).filter(Boolean);
 
-    const heroInterval = pick(data, 'heroSliderIntervalSeconds', 'HeroSliderIntervalSeconds');
+    const heroIntervalRaw = pick(data, 'heroSliderIntervalSeconds', 'HeroSliderIntervalSeconds');
+    const heroInterval = Math.max(3, Math.min(120, parseInt(heroIntervalRaw, 10) || 8));
     const heroAutoTrailer = pick(data, 'heroSliderAutoPlayTrailer', 'HeroSliderAutoPlayTrailer');
     buildHero(heroEl, normalizedHero, userId, {
-      intervalSeconds: typeof heroInterval === 'number' && heroInterval > 0 ? heroInterval : 8,
+      intervalSeconds: heroInterval,
       autoPlayTrailer: heroAutoTrailer !== false,
     });
 

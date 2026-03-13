@@ -106,21 +106,33 @@ function buildCard(item, cardType) {
     ? buildImageFallback(itemId, 'Backdrop', 800)
     : buildImageFallback(itemId, 'Primary', 420));
 
+  const cardScalable = document.createElement('div');
+  cardScalable.className = 'cardScalable';
   const cardBox = document.createElement('div');
   cardBox.className = 'cardBox cardPadder';
 
-  const image = document.createElement('div');
-  image.className = 'cardImageContainer coveredImage defaultCardBackground';
-  image.style.backgroundImage = resolvedUrl ? `url("${toClientImageUrl(resolvedUrl)}")` : '';
-  image.setAttribute('aria-hidden', 'true');
-  cardBox.appendChild(image);
+  const imageContainer = document.createElement('div');
+  imageContainer.className = 'cardImageContainer coveredImage defaultCardBackground';
+  imageContainer.setAttribute('aria-hidden', 'true');
+  const img = document.createElement('img');
+  img.className = 'cardImage';
+  img.alt = item.title || '';
+  img.loading = 'lazy';
+  img.src = resolvedUrl ? toClientImageUrl(resolvedUrl) : '';
+  img.onerror = function () {
+    const fallback = useBackdrop ? buildImageFallback(itemId, 'Backdrop', 800) : buildImageFallback(itemId, 'Primary', 420);
+    if (fallback) this.src = toClientImageUrl(fallback);
+  };
+  imageContainer.appendChild(img);
+  cardBox.appendChild(imageContainer);
 
   const text = document.createElement('div');
   text.className = 'cardText cardTextCentered';
   text.textContent = item.title || '';
 
-  card.appendChild(cardBox);
-  card.appendChild(text);
+  cardBox.appendChild(text);
+  cardScalable.appendChild(cardBox);
+  card.appendChild(cardScalable);
 
   card.addEventListener('click', () => {
     if (itemId) {

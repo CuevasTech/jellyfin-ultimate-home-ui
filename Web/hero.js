@@ -1,16 +1,13 @@
 /**
  * UHUI — Hero Media Slider
- * Full-viewport banner with backdrop/trailer autoplay, metadata overlay,
- * dot indicators, and auto-rotation.
+ * Estructura y clases idénticas a jellyfin-plugin-media-bar (slideshowpure)
+ * para que el aspecto visual sea el mismo: blur, máscaras, logo, plot, botones.
  */
 
 let slideTimer = null;
 let currentIndex = 0;
 let heroItems = [];
-let heroEl = null;
-let videoEl = null;
-let trailerFrameEl = null;
-let isMuted = true;
+let heroRoot = null;
 let slideIntervalMs = 8000;
 let allowTrailerAutoplay = true;
 
@@ -21,8 +18,19 @@ function toClientImageUrl(path) {
   if (typeof ApiClient !== 'undefined' && typeof ApiClient.getUrl === 'function') {
     return ApiClient.getUrl(clean);
   }
-
   return '/' + clean;
+}
+
+function buildImageUrl(itemId, type, maxWidth = 1920) {
+  if (!itemId) return '';
+  if (typeof ApiClient !== 'undefined' && typeof ApiClient.getImageUrl === 'function') {
+    try {
+      return ApiClient.getImageUrl(itemId, { type, maxWidth, quality: 90 });
+    } catch {
+      // ignore
+    }
+  }
+  return toClientImageUrl(`/Items/${itemId}/Images/${type}?maxWidth=${maxWidth}&quality=90`);
 }
 
 function extractYouTubeId(url) {
@@ -31,292 +39,228 @@ function extractYouTubeId(url) {
   return match ? match[1] : null;
 }
 
-function buildImageFallback(itemId, type, maxWidth = 1600) {
-  if (!itemId) return '';
-  if (typeof ApiClient !== 'undefined' && typeof ApiClient.getImageUrl === 'function') {
-    try {
-      return ApiClient.getImageUrl(itemId, { type, maxWidth, quality: 90 });
-    } catch {
-      // ignore and fallback
+function createEl(tag, attrs) {
+  const el = document.createElement(tag);
+  if (attrs) {
+    if (attrs.className) el.className = attrs.className;
+    if (attrs.src) el.src = toClientImageUrl(attrs.src);
+    if (attrs.alt !== undefined) el.alt = attrs.alt;
+    if (attrs.loading) el.loading = attrs.loading;
+    if (attrs.innerHTML !== undefined) el.innerHTML = attrs.innerHTML;
+    if (attrs.textContent !== undefined) el.textContent = attrs.textContent;
+    if (attrs['data-item-id']) el.dataset.itemId = attrs['data-item-id'];
+    if (attrs.type) el.type = attrs.type;
+    Object.keys(attrs).forEach((k) => {
+      if (['className', 'src', 'alt', 'loading', 'innerHTML', 'textContent', 'data-item-id', 'type'].includes(k)) return;
+      if (k.startsWith('on') && typeof attrs[k] === 'function') el.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
+      else if (k === 'tabIndex') el.tabIndex = attrs[k];
+      else if (k === 'ariaLabel') el.setAttribute('aria-label', attrs[k]);
+    });
+  }
+  return el;
+}
+
+function buildOneSlide(item) {
+  const itemId = item.itemId;
+  const slide = createEl('div', { className: 'slide', 'data-item-id': itemId });
+
+  const backdropUrl = item.backdropUrl || buildImageUrl(itemId, 'Backdrop', 1920);
+  const backdrop = createEl('img', {
+    className: 'backdrop high-quality',
+    src: backdropUrl,
+    alt: item.title || '',
+    loading: 'eager',
+  });
+  backdrop.onerror = function () {
+    this.src = toClientImageUrl(buildImageUrl(itemId, 'Primary', 1280));
+  };
+
+  const backdropOverlay = createEl('div', { className: 'backdrop-overlay' });
+  const backdropContainer = createEl('div', { className: 'backdrop-container' });
+  backdropContainer.append(backdrop, backdropOverlay);
+
+  const logoUrl = item.logoUrl || buildImageUrl(itemId, 'Logo', 400);
+  const logo = createEl('img', {
+    className: 'logo high-quality',
+    src: logoUrl,
+    alt: item.title || '',
+    loading: 'eager',
+  });
+  logo.onerror = function () {
+    this.style.display = 'none';
+  };
+  const logoContainer = createEl('div', { className: 'logo-container' });
+  logoContainer.appendChild(logo);
+
+  const gradientOverlay = createEl('div', { className: 'gradient-overlay' });
+
+  const plotText = (item.overview || '').slice(0, 360);
+  const plotEl = createEl('div', { className: 'plot', textContent: plotText });
+  const plotContainer = createEl('div', { className: 'plot-container' });
+  plotContainer.appendChild(plotEl);
+
+  const infoContainer = createEl('div', { className: 'info-container' });
+  const miscInfo = createEl('div', { className: 'misc-info' });
+  if (item.communityRating != null) {
+    const star = createEl('span', { className: 'community-rating-star', textContent: '★ ' + Number(item.communityRating).toFixed(1) });
+    miscInfo.appendChild(star);
+  }
+  if (item.year) {
+    const year = createEl('span', { className: 'date', textContent: item.year });
+    miscInfo.appendChild(year);
+  }
+  if (item.officialRating) {
+    const age = createEl('span', { className: 'age-rating', textContent: item.officialRating });
+    miscInfo.appendChild(age);
+  }
+  if (item.runtimeMinutes != null) {
+    const h = Math.floor(item.runtimeMinutes / 60);
+    const m = item.runtimeMinutes % 60;
+    const run = createEl('span', { className: 'runTime', textContent: h > 0 ? `${h}h ${m}m` : `${m}m` });
+    miscInfo.appendChild(run);
+  }
+  infoContainer.appendChild(miscInfo);
+
+  const genreStr = Array.isArray(item.genres) ? item.genres.join(' · ') : (item.genres || '');
+  const genreEl = createEl('div', { className: 'genre', textContent: genreStr });
+
+  const buttonContainer = createEl('div', { className: 'button-container' });
+  const playBtn = createEl('button', {
+    className: 'play-button',
+    innerHTML: ' Reproducir ',
+    tabIndex: 0,
+    onClick: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (itemId) window.location.href = `#!/details?id=${itemId}`;
+    },
+  });
+  const detailBtn = createEl('button', { className: 'detail-button', tabIndex: 0, onClick: (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (itemId) window.location.href = `#!/details?id=${itemId}`;
+  } });
+  const favBtn = createEl('button', {
+    className: `favorite-button${item.isFavorite ? ' favorited' : ''}`,
+    tabIndex: 0,
+    onClick: (e) => { e.preventDefault(); e.stopPropagation(); },
+  });
+  buttonContainer.append(detailBtn, playBtn, favBtn);
+
+  slide.append(logoContainer, backdropContainer, gradientOverlay, plotContainer, infoContainer, genreEl, buttonContainer);
+
+  if (allowTrailerAutoplay && item.trailerUrl) {
+    const ytId = extractYouTubeId(item.trailerUrl);
+    if (ytId) {
+      const videoContainer = createEl('div', { className: 'video-container', id: `trailer-${itemId}` });
+      const playerDiv = createEl('div', { className: 'video-player', id: `yt-player-${itemId}` });
+      videoContainer.appendChild(playerDiv);
+      slide.insertBefore(videoContainer, slide.firstChild);
+      slide.dataset.ytId = ytId;
     }
   }
 
-  return toClientImageUrl(`/Items/${itemId}/Images/${type}?maxWidth=${maxWidth}&quality=90`);
+  return slide;
+}
+
+function setActiveSlide(slidesContainer, index) {
+  const slides = slidesContainer.querySelectorAll('.slide');
+  slides.forEach((s, i) => s.classList.toggle('active', i === index));
+  const activeSlide = slides[index];
+  if (activeSlide) {
+    const backdrop = activeSlide.querySelector('.backdrop');
+    const plotContainer = activeSlide.querySelector('.plot-container');
+    const hasVideo = activeSlide.querySelector('.video-container');
+    if (backdrop) backdrop.classList.toggle('with-video', !!hasVideo);
+    if (plotContainer) plotContainer.classList.toggle('with-video', !!hasVideo);
+  }
+}
+
+function updateDots(slidesContainer, activeIdx) {
+  const dots = slidesContainer.querySelectorAll('.dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
 }
 
 export function buildHero(container, items, userId, options = {}) {
-  heroEl = container;
-  heroItems = items;
+  heroRoot = container;
+  heroItems = items || [];
   currentIndex = 0;
   slideIntervalMs = Math.max((options.intervalSeconds || 8) * 1000, 2000);
   allowTrailerAutoplay = options.autoPlayTrailer !== false;
 
-  if (!items || items.length === 0) {
+  container.innerHTML = '';
+  if (!heroItems.length) {
     container.style.display = 'none';
     return;
   }
+  container.style.display = '';
 
-  renderSlide(container, items[0]);
-  buildDots(container, items.length);
+  const slidesContainer = createEl('div', { id: 'slides-container' });
+  container.appendChild(slidesContainer);
 
-  if (items.length > 1) {
-    slideTimer = setInterval(() => {
-      currentIndex = (currentIndex + 1) % heroItems.length;
-      renderSlide(container, heroItems[currentIndex]);
-      updateDots(container, currentIndex);
-    }, slideIntervalMs);
-  }
-}
-
-function renderSlide(container, item) {
-  clearMedia(container);
-  const backdropUrl = item.backdropUrl || buildImageFallback(item.itemId, 'Backdrop', 1920);
-  const mediaLayer = document.createElement('div');
-  mediaLayer.className = 'uhui-hero__media backdrop-container';
-  container.prepend(mediaLayer);
-
-  if (allowTrailerAutoplay && item.trailerUrl && isEmbeddableTrailer(item.trailerUrl)) {
-    renderTrailer(mediaLayer, item);
-  } else if (backdropUrl) {
-    const img = document.createElement('img');
-    img.className = 'uhui-hero__backdrop backdrop';
-    img.src = toClientImageUrl(backdropUrl);
-    img.alt = item.title || '';
-    img.loading = 'eager';
-    img.decoding = 'async';
-    img.onerror = () => {
-      img.src = buildImageFallback(item.itemId, 'Primary', 1280);
-    };
-    mediaLayer.appendChild(img);
-  }
-
-  const overlay = document.createElement('div');
-  overlay.className = 'backdrop-overlay';
-  mediaLayer.appendChild(overlay);
-
-  const existingGrad = container.querySelector('.uhui-hero__gradient');
-  if (!existingGrad) {
-    const grad = document.createElement('div');
-    grad.className = 'uhui-hero__gradient gradient-overlay';
-    container.appendChild(grad);
-  }
-
-  renderMeta(container, item);
-}
-
-function renderTrailer(mediaLayer, item) {
-  const youtubeId = extractYouTubeId(item.trailerUrl);
-  if (youtubeId) {
-    const iframe = document.createElement('iframe');
-    iframe.className = 'uhui-hero__backdrop uhui-hero__backdrop--video backdrop with-video';
-    iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${youtubeId}&playsinline=1&modestbranding=1&rel=0`;
-    iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
-    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-    iframe.setAttribute('frameborder', '0');
-    iframe.setAttribute('allowfullscreen', '');
-    trailerFrameEl = iframe;
-    mediaLayer.appendChild(iframe);
-    return;
-  }
-
-  const video = document.createElement('video');
-  video.className = 'uhui-hero__backdrop uhui-hero__backdrop--video backdrop with-video';
-  video.src = item.trailerUrl;
-  video.autoplay = true;
-  video.loop = true;
-  video.muted = isMuted;
-  video.playsInline = true;
-  const backdropUrl = item.backdropUrl || buildImageFallback(item.itemId, 'Backdrop', 1920);
-  video.poster = backdropUrl ? toClientImageUrl(backdropUrl) : '';
-  videoEl = video;
-  mediaLayer.appendChild(video);
-
-  video.play().catch(() => {
-    video.remove();
-    videoEl = null;
-    if (backdropUrl) {
-      const img = document.createElement('img');
-      img.className = 'uhui-hero__backdrop backdrop';
-      img.src = toClientImageUrl(backdropUrl);
-      img.alt = item.title || '';
-      mediaLayer.appendChild(img);
-    }
+  heroItems.forEach((item) => {
+    const slide = buildOneSlide(item);
+    slidesContainer.appendChild(slide);
   });
 
-  buildSoundToggle(mediaLayer.parentElement || mediaLayer);
-}
+  const firstSlide = slidesContainer.querySelector('.slide');
+  if (firstSlide) firstSlide.classList.add('active');
+  const firstBackdrop = firstSlide?.querySelector('.backdrop');
+  const firstPlot = firstSlide?.querySelector('.plot-container');
+  const firstHasVideo = firstSlide?.querySelector('.video-container');
+  if (firstBackdrop) firstBackdrop.classList.toggle('with-video', !!firstHasVideo);
+  if (firstPlot) firstPlot.classList.toggle('with-video', !!firstHasVideo);
 
-function isEmbeddableTrailer(url) {
-  if (!url) return false;
-  return /(?:youtube\.com|youtu\.be)/i.test(url)
-    || url.endsWith('.mp4')
-    || url.endsWith('.webm')
-    || url.includes('/Videos/');
-}
-
-function buildSoundToggle(container) {
-  let btn = container.querySelector('.uhui-hero__sound');
-  if (btn) return;
-
-  btn = document.createElement('button');
-  btn.className = 'uhui-hero__sound';
-  btn.setAttribute('aria-label', 'Toggle sound');
-  btn.textContent = isMuted ? '🔇' : '🔊';
-  btn.addEventListener('click', () => {
-    isMuted = !isMuted;
-    btn.textContent = isMuted ? '🔇' : '🔊';
-    if (videoEl) videoEl.muted = isMuted;
-  });
-  container.appendChild(btn);
-}
-
-function renderMeta(container, item) {
-  let meta = container.querySelector('.uhui-hero__meta');
-  if (meta) meta.remove();
-
-  meta = document.createElement('div');
-  meta.className = 'uhui-hero__meta';
-
-  if (item.logoUrl) {
-    const logo = document.createElement('img');
-    logo.className = 'uhui-hero__logo';
-    logo.src = toClientImageUrl(item.logoUrl);
-    logo.alt = item.title || '';
-    logo.loading = 'eager';
-    meta.appendChild(logo);
-  } else {
-    const title = document.createElement('h1');
-    title.className = 'uhui-hero__title';
-    title.textContent = item.title || '';
-    meta.appendChild(title);
-  }
-
-  const info = document.createElement('div');
-  info.className = 'uhui-hero__info';
-
-  if (item.communityRating) {
-    const rating = document.createElement('span');
-    rating.className = 'uhui-hero__rating';
-    rating.textContent = `★ ${item.communityRating.toFixed(1)}`;
-    info.appendChild(rating);
-  }
-
-  if (item.year) {
-    const year = document.createElement('span');
-    year.textContent = item.year;
-    info.appendChild(year);
-  }
-
-  if (item.officialRating) {
-    const badge = document.createElement('span');
-    badge.className = 'uhui-hero__badge';
-    badge.textContent = item.officialRating;
-    info.appendChild(badge);
-  }
-
-  if (item.runtimeMinutes) {
-    const runtime = document.createElement('span');
-    const h = Math.floor(item.runtimeMinutes / 60);
-    const m = item.runtimeMinutes % 60;
-    runtime.textContent = h > 0 ? `${h}h ${m}m` : `${m}m`;
-    info.appendChild(runtime);
-  }
-
-  if (item.genres) {
-    const genres = document.createElement('span');
-    genres.textContent = item.genres;
-    genres.className = 'uhui-hero__genres';
-    info.appendChild(genres);
-  }
-
-  meta.appendChild(info);
-
-  if (item.overview) {
-    const overview = document.createElement('p');
-    overview.className = 'uhui-hero__overview';
-    overview.textContent = item.overview;
-    meta.appendChild(overview);
-  }
-
-  const actions = document.createElement('div');
-  actions.className = 'uhui-hero__actions';
-
-  const playBtn = document.createElement('button');
-  playBtn.className = 'uhui-hero__btn uhui-hero__btn--play';
-  playBtn.setAttribute('data-focusable', '');
-  playBtn.textContent = 'Reproducir';
-  playBtn.addEventListener('click', () => {
-    if (item.itemId) {
-      window.location.href = `#!/details?id=${item.itemId}`;
-    }
-  });
-  actions.appendChild(playBtn);
-
-  const favBtn = document.createElement('button');
-  favBtn.className = `uhui-hero__btn uhui-hero__btn--fav${item.isFavorite ? ' is-fav' : ''}`;
-  favBtn.setAttribute('data-focusable', '');
-  favBtn.setAttribute('aria-label', item.isFavorite ? 'Favorito' : 'Añadir a favoritos');
-  actions.appendChild(favBtn);
-
-  meta.appendChild(actions);
-  container.appendChild(meta);
-}
-
-function buildDots(container, count) {
-  if (count <= 1) return;
-
-  const dotsWrap = document.createElement('div');
-  dotsWrap.className = 'uhui-hero__dots';
-
-  for (let i = 0; i < count; i++) {
-    const dot = document.createElement('button');
-    dot.className = `uhui-hero__dot${i === 0 ? ' uhui-hero__dot--active' : ''}`;
-    dot.setAttribute('aria-label', `Slide ${i + 1}`);
-    dot.addEventListener('click', () => {
-      currentIndex = i;
-      renderSlide(container, heroItems[i]);
-      updateDots(container, i);
+  if (heroItems.length > 1) {
+    const leftArrow = createEl('div', { className: 'arrow left-arrow', innerHTML: '&#10094;' });
+    leftArrow.addEventListener('click', () => {
+      currentIndex = (currentIndex - 1 + heroItems.length) % heroItems.length;
+      setActiveSlide(slidesContainer, currentIndex);
+      updateDots(slidesContainer, currentIndex);
       resetTimer();
     });
-    dotsWrap.appendChild(dot);
+    const rightArrow = createEl('div', { className: 'arrow right-arrow', innerHTML: '&#10095;' });
+    rightArrow.addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % heroItems.length;
+      setActiveSlide(slidesContainer, currentIndex);
+      updateDots(slidesContainer, currentIndex);
+      resetTimer();
+    });
+    slidesContainer.appendChild(leftArrow);
+    slidesContainer.appendChild(rightArrow);
+
+    const dotsContainer = createEl('div', { className: 'dots-container' });
+    for (let i = 0; i < heroItems.length; i++) {
+      const dot = createEl('button', { className: `dot${i === 0 ? ' active' : ''}`, type: 'button', ariaLabel: `Slide ${i + 1}` });
+      dot.addEventListener('click', () => {
+        currentIndex = i;
+        setActiveSlide(slidesContainer, currentIndex);
+        updateDots(slidesContainer, currentIndex);
+        resetTimer();
+      });
+      dotsContainer.appendChild(dot);
+    }
+    slidesContainer.appendChild(dotsContainer);
+
+    slideTimer = setInterval(() => {
+      currentIndex = (currentIndex + 1) % heroItems.length;
+      setActiveSlide(slidesContainer, currentIndex);
+      updateDots(slidesContainer, currentIndex);
+    }, slideIntervalMs);
   }
-
-  container.appendChild(dotsWrap);
-}
-
-function updateDots(container, activeIdx) {
-  const dots = container.querySelectorAll('.uhui-hero__dot');
-  dots.forEach((d, i) => {
-    d.classList.toggle('uhui-hero__dot--active', i === activeIdx);
-  });
 }
 
 function resetTimer() {
   if (slideTimer) clearInterval(slideTimer);
-  if (heroItems.length > 1) {
-    slideTimer = setInterval(() => {
-      currentIndex = (currentIndex + 1) % heroItems.length;
-      renderSlide(heroEl, heroItems[currentIndex]);
-      updateDots(heroEl, currentIndex);
-    }, slideIntervalMs);
-  }
-}
-
-function clearMedia(container) {
-  const oldLayer = container.querySelector('.uhui-hero__media');
-  if (oldLayer) oldLayer.remove();
-
-  if (trailerFrameEl) {
-    trailerFrameEl.remove();
-    trailerFrameEl = null;
-  }
-
-  const oldImg = container.querySelector('.uhui-hero__backdrop:not(.uhui-hero__backdrop--video)');
-  if (oldImg) oldImg.remove();
-  if (videoEl) {
-    videoEl.pause();
-    videoEl.remove();
-    videoEl = null;
+  if (heroItems.length > 1 && heroRoot) {
+    const slidesContainer = heroRoot.querySelector('#slides-container');
+    if (slidesContainer) {
+      slideTimer = setInterval(() => {
+        currentIndex = (currentIndex + 1) % heroItems.length;
+        setActiveSlide(slidesContainer, currentIndex);
+        updateDots(slidesContainer, currentIndex);
+      }, slideIntervalMs);
+    }
   }
 }
 
@@ -325,13 +269,7 @@ export function destroyHero() {
     clearInterval(slideTimer);
     slideTimer = null;
   }
-  if (videoEl) {
-    videoEl.pause();
-    videoEl.remove();
-    videoEl = null;
-  }
-  trailerFrameEl = null;
   heroItems = [];
   currentIndex = 0;
-  heroEl = null;
+  heroRoot = null;
 }
