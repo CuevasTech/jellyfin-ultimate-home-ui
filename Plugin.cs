@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Reflection;
 using Jellyfin.Plugin.UltimateHomeUI.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
@@ -20,6 +21,8 @@ namespace Jellyfin.Plugin.UltimateHomeUI;
 public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 {
     private readonly ILogger<Plugin> _logger;
+    private const string ScriptTagMarker = "plugin=\"UltimateHomeUI\"";
+    private static readonly Guid FileTransformationRegistrationId = Guid.Parse("55f6c896-6150-4f8b-926f-54e8dcf7dbd1");
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Plugin"/> class.
@@ -45,6 +48,8 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 
         try
         {
+            RegisterFileTransformationInjection();
+            // Fallback para servidores sin File Transformation instalado.
             InjectClientScript(applicationPaths, configurationManager);
         }
         catch (Exception ex)
@@ -66,6 +71,12 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     /// Gets the current plugin instance.
     /// </summary>
     public static Plugin? Instance { get; private set; }
+
+    /// <summary>Gets a value indicating whether index.html was patched on disk.</summary>
+    public static bool IndexInjectionActive { get; private set; }
+
+    /// <summary>Gets a value indicating whether runtime File Transformation injection is active.</summary>
+    public static bool FileTransformationInjectionActive { get; private set; }
 
     /// <inheritdoc />
     public IEnumerable<PluginPageInfo> GetPages()
@@ -220,6 +231,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
             if (indexContents.Contains(scriptTag, StringComparison.Ordinal))
             {
                 _logger.LogInformation("[UHUI] Script ya presente en {IndexFile}", indexFile);
+                IndexInjectionActive = true;
                 return;
             }
 
@@ -233,6 +245,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
             indexContents = indexContents.Insert(bodyClose, scriptTag + "\n");
             File.WriteAllText(indexFile, indexContents);
             _logger.LogInformation("[UHUI] Script inyectado en {IndexFile}", indexFile);
+            IndexInjectionActive = true;
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -246,4 +259,142 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
             _logger.LogError(ex, "[UHUI] Error al inyectar el script en {IndexFile}", indexFile);
         }
     }
+
+    /// <summary>
+    /// Registra una transformación de index.html en runtime si el plugin
+    /// "File Transformation" está instalado. Evita depender de permisos de escritura en disco.
+    /// </summary>
+    private void RegisterFileTransformationInjection()
+    {
+        try
+        {
+            var ftAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a => a.FullName?.Contains(".FileTransformation", StringComparison.OrdinalIgnoreCase) == true);
+
+            if (ftAssembly is null)
+            {
+                _logger.LogInformation("[UHUI] File Transformation no instalado. Se usará inyección en disco como fallback.");
+                return;
+            }
+
+            var pluginInterfaceType = ftAssembly.GetType("Jellyfin.Plugin.FileTransformation.PluginInterface");
+            var registerMethod = pluginInterfaceType?.GetMethod("RegisterTransformation", BindingFlags.Public | BindingFlags.Static);
+            if (registerMethod is null)
+            {
+                _logger.LogWarning("[UHUI] File Transformation detectado pero no se encontró RegisterTransformation.");
+                return;
+            }
+
+            var jObjectType = ftAssembly.GetType("Newtonsoft.Json.Linq.JObject")
+                ?? AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("Newtonsoft.Json.Linq.JObject")).FirstOrDefault(t => t is not null);
+            if (jObjectType is null)
+            {
+                _logger.LogWarning("[UHUI] No se pudo resolver Newtonsoft.Json.Linq.JObject para registrar transformación.");
+                return;
+            }
+
+            var parseMethod = jObjectType.GetMethod("Parse", [typeof(string)]);
+            if (parseMethod is null)
+            {
+                _logger.LogWarning("[UHUI] No se pudo resolver JObject.Parse(string).");
+                return;
+            }
+
+            var payloadJson = "{"
+                + $"\"id\":\"{FileTransformationRegistrationId}\","
+                + "\"fileNamePattern\":\"index\\\\.html$\","
+                + $"\"callbackAssembly\":\"{EscapeJson(typeof(Plugin).Assembly.FullName ?? string.Empty)}\","
+                + $"\"callbackClass\":\"{EscapeJson(typeof(Plugin).FullName ?? string.Empty)}\","
+                + $"\"callbackMethod\":\"{nameof(TransformIndexHtml)}\""
+                + "}";
+
+            var payloadObj = parseMethod.Invoke(null, [payloadJson]);
+            registerMethod.Invoke(null, [payloadObj]);
+
+            FileTransformationInjectionActive = true;
+            _logger.LogInformation("[UHUI] File Transformation registrado correctamente para index.html.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[UHUI] Error registrando File Transformation.");
+        }
+    }
+
+    /// <summary>
+    /// Callback invocado por jellyfin-plugin-file-transformation para parchear index.html en memoria.
+    /// </summary>
+    /// <param name="payload">Objeto con propiedad 'contents'.</param>
+    /// <returns>HTML transformado.</returns>
+    public static string TransformIndexHtml(object payload)
+    {
+        var contents = GetPayloadContents(payload);
+        if (string.IsNullOrEmpty(contents))
+        {
+            return contents;
+        }
+
+        var scriptTag = "<script type=\"module\" src=\"/UltimateHomeUI/Web/plugin-entry.js\" plugin=\"UltimateHomeUI\"></script>";
+
+        // Limpiar cualquier registro previo del mismo plugin para evitar duplicados.
+        var cleaned = Regex.Replace(
+            contents,
+            @"<script[^>]*plugin=""UltimateHomeUI""[^>]*>\s*</script>",
+            string.Empty,
+            RegexOptions.Singleline);
+
+        if (cleaned.Contains(ScriptTagMarker, StringComparison.Ordinal))
+        {
+            return cleaned;
+        }
+
+        var bodyClose = cleaned.LastIndexOf("</body>", StringComparison.OrdinalIgnoreCase);
+        if (bodyClose < 0)
+        {
+            return cleaned;
+        }
+
+        return cleaned.Insert(bodyClose, scriptTag + "\n");
+    }
+
+    private static string GetPayloadContents(object payload)
+    {
+        if (payload is null)
+        {
+            return string.Empty;
+        }
+
+        var type = payload.GetType();
+
+        // Soporte JObject dinámico (payload["contents"])
+        try
+        {
+            var itemProp = type.GetProperty("Item", [typeof(object)]);
+            if (itemProp is not null)
+            {
+                var token = itemProp.GetValue(payload, ["contents"]);
+                var tokenType = token?.GetType();
+                var tokenToString = tokenType?.GetMethod("ToString", Type.EmptyTypes);
+                if (tokenToString is not null)
+                {
+                    var value = tokenToString.Invoke(token, null)?.ToString();
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        return value;
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Ignore and continue.
+        }
+
+        // Soporte POCO payload.contents
+        var contentsProp = type.GetProperty("contents", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+        return contentsProp?.GetValue(payload)?.ToString() ?? string.Empty;
+    }
+
+    private static string EscapeJson(string input)
+        => input.Replace("\\", "\\\\", StringComparison.Ordinal)
+            .Replace("\"", "\\\"", StringComparison.Ordinal);
 }

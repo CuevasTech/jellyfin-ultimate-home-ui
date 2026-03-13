@@ -16,6 +16,18 @@ public class WebAssetsController : ControllerBase
 {
     private static readonly Assembly PluginAssembly = typeof(Plugin).Assembly;
 
+    /// <summary>Estado de activación del inyector de frontend.</summary>
+    [HttpGet("InjectionStatus")]
+    public ActionResult GetInjectionStatus()
+    {
+        return Ok(new
+        {
+            indexInjectionActive = Plugin.IndexInjectionActive,
+            fileTransformationInjectionActive = Plugin.FileTransformationInjectionActive,
+            isActive = Plugin.IndexInjectionActive || Plugin.FileTransformationInjectionActive,
+        });
+    }
+
     /// <summary>Sirve un archivo JS o CSS del frontend.</summary>
     [HttpGet("Web/{filename}")]
     public ActionResult GetAsset([FromRoute] string filename)

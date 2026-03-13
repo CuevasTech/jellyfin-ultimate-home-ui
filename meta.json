@@ -7,8 +7,8 @@
   "category": "UI",
   "versions": [
     {
-      "version": "1.5.2.0",
-      "changelog": "Fix duplicacion de secciones, interceptor robusto, constructor defensivo.",
+      "version": "1.5.3.0",
+      "changelog": "Inyeccion via File Transformation (runtime) + fallback index.html. Estado de inyeccion en config. Fetch home con ApiClient.",
       "targetAbi": "10.11.0.0",
       "sourceUrl": "",
       "checksum": "",

@@ -98,18 +98,20 @@ function buildHeaders() {
 // ── Fetch de datos ────────────────────────────────────────────────────────────
 
 async function fetchHomeData(userId) {
+  // Ruta preferida: usa ApiClient para que Jellyfin gestione auth/device headers.
+  if (typeof ApiClient !== 'undefined' && ApiClient.getJSON && ApiClient.getUrl) {
+    const apiUrl = ApiClient.getUrl(`Plugins/UltimateHomeUI/Home/${userId}`);
+    return ApiClient.getJSON(apiUrl);
+  }
+
+  // Fallback: fetch manual si ApiClient no está disponible.
   const base = getServerAddress();
   const url = `${base}/Plugins/UltimateHomeUI/Home/${userId}`;
-
   const response = await fetch(url, {
     headers: buildHeaders(),
     credentials: 'same-origin',
   });
-
-  if (!response.ok) {
-    throw new Error(`[UHUI] API /Home/${userId} devolvió ${response.status}`);
-  }
-
+  if (!response.ok) throw new Error(`[UHUI] API /Home/${userId} devolvió ${response.status}`);
   return response.json();
 }
 
